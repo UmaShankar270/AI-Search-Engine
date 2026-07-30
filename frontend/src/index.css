@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-gray-50: #fafafa;
+  --color-brand-gray-100: #f4f4f5;
+  --color-brand-gray-200: #e4e4e7;
+  --color-brand-gray-300: #d4d4d8;
+  --color-brand-gray-400: #a1a1aa;
+  --color-brand-gray-500: #71717a;
+  --color-brand-gray-600: #52525b;
+  --color-brand-gray-700: #3f3f46;
+  --color-brand-gray-800: #27272a;
+  --color-brand-gray-900: #18181b;
+  --color-brand-gray-950: #09090b;
+
+  --color-accent-blue-50: #eff6ff;
+  --color-accent-blue-500: #3b82f6;
+  --color-accent-blue-600: #2563eb;
+  --color-accent-blue-700: #1d4ed8;
+
+  --color-github-dark: #0d1117;
+  --color-github-border: #30363d;
+  --color-github-card: #161b22;
+  
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
