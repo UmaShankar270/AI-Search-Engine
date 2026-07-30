@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import requests
 
 router = APIRouter()
@@ -9,6 +9,13 @@ def repo_details(owner: str, repo: str):
     url = f"https://api.github.com/repos/{owner}/{repo}"
 
     response = requests.get(url)
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=404,
+            detail="Repository not found"
+        )
+
     data = response.json()
 
     return {
