@@ -206,7 +206,7 @@ class SemanticSearchEngine:
         self,
         embeddings: np.ndarray,
         ids: list[str],
-        metadata_list: Optional[list[Optional[dict]]] = None,
+        metadata_list: Optional[list[Optional[dict[str, Any]]]] = None,
     ) -> IndexStats:
         if len(embeddings) != len(ids):
             raise ValueError(
@@ -270,7 +270,7 @@ class SemanticSearchEngine:
         self,
         embeddings: np.ndarray,
         ids: list[str],
-        metadata_list: Optional[list[Optional[dict]]] = None,
+        metadata_list: Optional[list[Optional[dict[str, Any]]]] = None,
     ) -> None:
         if len(embeddings) != len(ids):
             raise ValueError(

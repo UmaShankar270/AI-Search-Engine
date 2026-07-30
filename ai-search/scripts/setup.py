@@ -7,7 +7,7 @@ Downloads the Sentence Transformer model and creates necessary directories.
 """
 
 
-def main():
+def main() -> None:
     pass
 
 

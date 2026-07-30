@@ -1,8 +1,8 @@
 import hashlib
-import time
 import logging
+import time
 from collections import OrderedDict
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -59,7 +59,7 @@ class EmbeddingCache:
         return len(self._cache)
 
     @property
-    def stats(self) -> dict:
+    def stats(self) -> dict[str, Any]:
         total = self._hits + self._misses
         hit_rate = self._hits / total if total > 0 else 0.0
         return {

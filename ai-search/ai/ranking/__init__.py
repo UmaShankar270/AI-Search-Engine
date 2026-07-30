@@ -1,3 +1,56 @@
-from ai.ranking.ranker import RankingEngine
+from .calculator import ScoreCalculator
+from .factors import (
+    BaseFactor,
+    CommitFrequency,
+    CommunityAdoption,
+    ContributorCount,
+    DocumentationQuality,
+    ForkCount,
+    GitHubStars,
+    IssueResolutionRate,
+    LicenseAvailability,
+    PopularityTrend,
+    PRActivity,
+    READMECompleteness,
+    RecentActivity,
+    ReleaseFrequency,
+    RepositoryAge,
+    RepositoryHealth,
+    SemanticSimilarity,
+    TechnologyMatch,
+    UserIntentMatch,
+)
+from .models import CandidateRepo, FactorScore, RankedResultSet, RankingResult
+from .normalization import NormalizationEngine
+from .service import RankingService
+from .weight_manager import WeightManager
 
-__all__ = ["RankingEngine"]
+__all__ = [
+    "BaseFactor",
+    "CandidateRepo",
+    "CommunityAdoption",
+    "CommitFrequency",
+    "ContributorCount",
+    "DocumentationQuality",
+    "FactorScore",
+    "ForkCount",
+    "GitHubStars",
+    "IssueResolutionRate",
+    "LicenseAvailability",
+    "NormalizationEngine",
+    "PRActivity",
+    "PopularityTrend",
+    "RankingResult",
+    "RankedResultSet",
+    "RankingService",
+    "READMECompleteness",
+    "RecentActivity",
+    "ReleaseFrequency",
+    "RepositoryAge",
+    "RepositoryHealth",
+    "ScoreCalculator",
+    "SemanticSimilarity",
+    "TechnologyMatch",
+    "UserIntentMatch",
+    "WeightManager",
+]

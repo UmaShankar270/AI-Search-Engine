@@ -1,5 +1,6 @@
 import logging
-from typing import Optional
+from typing import Any, Optional
+
 import numpy as np
 
 from ai.config.settings import Settings
@@ -9,14 +10,15 @@ logger = logging.getLogger(__name__)
 
 class ModelManager:
     _instance: Optional["ModelManager"] = None
+    _initialized: bool = False
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args: Any, **kwargs: Any) -> "ModelManager":
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, model_name: Optional[str] = None, device: Optional[str] = None):
+    def __init__(self, model_name: Optional[str] = None, device: Optional[str] = None) -> None:
         if self._initialized:
             return
         self._initialized = True
@@ -75,7 +77,7 @@ class ModelManager:
         if not self._loaded or self._model is None:
             self.load()
         try:
-            embeddings = self._model.encode(
+            embeddings = self._model.encode(  # type: ignore[attr-defined]
                 texts,
                 convert_to_numpy=True,
                 normalize_embeddings=False,

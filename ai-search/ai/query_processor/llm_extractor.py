@@ -1,7 +1,7 @@
 from ai.query_processor.interfaces import IExtractor
 from ai.query_processor.models import (
-    ExtractionContext, ExtractionResult,
-    ExtractedEntity, EntityType, IntentType,
+    ExtractionContext,
+    ExtractionResult,
 )
 
 
@@ -15,9 +15,9 @@ class LLMExtractor(IExtractor):
     """
 
     def __init__(self, provider: str = "openai", model: str = "gpt-4o-mini"):
-        self.provider = provider
+        self.provider: str | None = provider
         self.model = model
-        self._client = None
+        self._client: str | None = None
 
     def extract(self, context: ExtractionContext) -> ExtractionResult:
         if not self._is_available():
@@ -33,7 +33,12 @@ class LLMExtractor(IExtractor):
     def _call_llm(self, context: ExtractionContext) -> ExtractionResult:
         return ExtractionResult(entities=[], confidence=0.0)
 
-    def configure(self, provider: str | None = None, model: str | None = None, api_key: str | None = None):
+    def configure(
+        self,
+        provider: str | None = None,
+        model: str | None = None,
+        api_key: str | None = None,
+    ) -> None:
         if provider:
             self.provider = provider
         if model:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -12,9 +12,9 @@ class SearchHit:
     repo_id: str
     score: float
     rank: int
-    metadata: Optional[dict] = None
+    metadata: Optional[dict[str, Any]] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.score < 0 or self.score > 1:
             logger.warning(
                 "SearchHit score %.4f outside [0, 1] for repo %s",
@@ -22,7 +22,7 @@ class SearchHit:
                 self.repo_id,
             )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "repo_id": self.repo_id,
             "score": self.score,
@@ -39,7 +39,7 @@ class SearchResult:
     search_time_ms: float = 0.0
     threshold: float = 0.0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "query": self.query,
             "results": [r.to_dict() for r in self.results],
@@ -56,7 +56,7 @@ class IndexStats:
     index_type: str = ""
     memory_usage_bytes: int = 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "total_vectors": self.total_vectors,
             "dimension": self.dimension,
