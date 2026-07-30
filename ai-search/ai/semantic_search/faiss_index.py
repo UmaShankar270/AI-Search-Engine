@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 import numpy as np
 
@@ -28,7 +28,7 @@ class FAISSVectorIndex(IVectorIndex):
         self._nlist = nlist
         self._metric = metric
         self._use_id_map = use_id_map
-        self._index: Optional[object] = None
+        self._index: Any = None
         self._total = 0
 
     @staticmethod
@@ -70,7 +70,6 @@ class FAISSVectorIndex(IVectorIndex):
         return np.ascontiguousarray(vectors, dtype=np.float32)
 
     def build(self, embeddings: np.ndarray, ids: list[str]) -> IndexStats:
-        import faiss
 
         self.clear()
         self._dimension = embeddings.shape[1]
@@ -135,7 +134,6 @@ class FAISSVectorIndex(IVectorIndex):
         return results
 
     def add(self, embeddings: np.ndarray, ids: list[str]) -> None:
-        import faiss
 
         if self._index is None:
             self._lazy_init_index()
@@ -165,7 +163,7 @@ class FAISSVectorIndex(IVectorIndex):
             import faiss
 
             id_selector = faiss.IDSelectorArray(id_array)
-            removed = self._index.remove_ids(id_selector)
+            self._index.remove_ids(id_selector)
             self._total = self._index.ntotal
             logger.info(
                 "Removed %d vectors from FAISS index, total=%d",
@@ -222,8 +220,9 @@ class FAISSVectorIndex(IVectorIndex):
     def is_trained(self) -> bool:
         if self._index is None:
             return False
-        return self._index.is_trained
+        result: bool = self._index.is_trained
+        return result
 
     @property
-    def index(self) -> Optional[object]:
+    def index(self) -> Any:
         return self._index

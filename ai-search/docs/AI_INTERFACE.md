@@ -177,11 +177,128 @@ Retrieve current index statistics (vector count, dimension, type).
 
 Remove all vectors and metadata from the index.
 
-### Recommendation (future)
+### Ranking
 
-#### `recommend(repository_id, all_repositories, top_n=5) -> List[Recommendation]`
+#### `rank(query, candidates, intent=None, top_k=None) -> RankedResultSet`
 
-Generates recommendations for a given repository. (Planned.)
+Rank a list of `CandidateRepo` objects using the 18-factor weighted scoring model.
+
+**Input:**
+| Param | Type | Description |
+|-------|------|-------------|
+| `query` | str | Original search query |
+| `candidates` | list[CandidateRepo] | Repository candidates with metrics |
+| `intent` | str? | Query intent from understanding module |
+| `top_k` | int? | Max results to return |
+
+**Output:** `RankedResultSet`
+| Field | Type | Description |
+|-------|------|-------------|
+| `query` | str | Original query |
+| `results` | list[RankingResult] | Ranked results with per-factor breakdown |
+| `total_candidates` | int | Input candidate count |
+| `processing_time_ms` | float | Duration in ms |
+| `intent` | str? | Matching intent |
+
+**Example:**
+```python
+from ai.ranking.models import CandidateRepo
+
+candidates = [
+    CandidateRepo(repo_id="fastapi", semantic_score=0.92,
+                  stars=85000, forks=12000, contributors=500,
+                  days_since_last_commit=1, has_license=True,
+                  has_readme=True, readme_length=5000,
+                  issues_closed=2000, issues_total=2100,
+                  topics=["python", "api"], language="Python"),
+]
+result = facade.rank("python web framework", candidates, top_k=10)
+for r in result.results:
+    print(f"#{r.rank}: {r.repo_id} (score={r.final_score:.4f})")
+    breakpoint = [f"{fs.label}={fs.normalized_score:.2f}" for fs in r.factor_scores[:3]]
+```
+
+#### `rank_search_results(query, search_hits, repo_data_map, intent=None, top_k=None) -> RankedResultSet`
+
+Rank the output of `search()` by building `CandidateRepo` objects from search hits and a repo data dictionary.
+
+#### `rerank_with_cross_encoder(query, candidates, cross_encoder_fn) -> RankedResultSet`
+
+Re-score candidates using a cross-encoder model (e.g., `cross-encoder/ms-marco-MiniLM-L-6-v2`). Falls back gracefully on failure.
+
+#### `rerank_with_llm(query, candidates, llm_fn) -> RankedResultSet`
+
+Re-score candidates using an LLM. The `llm_fn` receives `(query, candidates)` and must return a list of scores. Falls back gracefully on failure.
+
+#### `get_ranking_weights() -> dict`
+
+Return current weight configuration for all 18 factors.
+
+#### `set_ranking_weight(factor_name, weight) -> None`
+
+Override a factor's weight at runtime. Persist with `save_ranking_config()`.
+
+#### `save_ranking_config(path) -> None`
+#### `load_ranking_config(path) -> None`
+
+Persist / restore ranking weights to/from a JSON file.
+
+### Recommendation
+
+#### `recommend(repository_id, all_repositories, embedding_map=None, top_n=5) -> RecommendationSet`
+
+Content-based recommendations: finds repositories similar to `repository_id` using embedding cosine similarity, topic Jaccard overlap, and language match.
+
+**Input:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `repository_id` | str | — | Source repository ID to base recommendations on |
+| `all_repositories` | list[dict] | — | All candidate repos, each with `repo_id`, `topics`, `language`, `stars`, etc. |
+| `embedding_map` | dict[str, np.ndarray]? | None | Pre-computed embeddings (auto-generated if omitted) |
+| `top_n` | int | 5 | Max recommendations to return |
+
+**Output:** `RecommendationSet`
+| Field | Type | Description |
+|-------|------|-------------|
+| `source` | str | e.g. `"repo:fastapi"` |
+| `recommendations` | list[Recommendation] | Ranked recommendations |
+| `total_candidates` | int | Candidates considered |
+| `processing_time_ms` | float | Duration in ms |
+| `strategy` | str | `"content_based"` |
+
+**Each `Recommendation`:**
+| Field | Type | Description |
+|-------|------|-------------|
+| `repo_id` | str | Recommended repo ID |
+| `score` | float | Aggregate similarity (0–1) |
+| `reason` | str | Human-readable explanation |
+| `similarity_score` | float | Raw embedding similarity |
+| `popularity_score` | float | Popularity component (0 for content-based) |
+| `language` | str | Repository language |
+| `matched_topics` | list[str] | Overlapping topics |
+
+**Example:**
+```python
+repos = [
+    {"repo_id": "fastapi", "topics": ["python", "api"], "language": "Python"},
+    {"repo_id": "flask", "topics": ["python", "web"], "language": "Python"},
+]
+result = facade.recommend("fastapi", repos, top_n=3)
+for rec in result.recommendations:
+    print(f"{rec.repo_id}: {rec.score:.3f} — {rec.reason}")
+```
+
+#### `recommend_from_query(query, all_repositories, embedding_map=None, top_n=5) -> RecommendationSet`
+
+Query-to-repository recommendations. Encodes the query and finds repos with highest cosine similarity.
+
+#### `recommend_hybrid(repository_id, all_repositories, embedding_map=None, user_profile=None, top_n=5) -> RecommendationSet`
+
+Hybrid recommendations combining content similarity (50%), popularity (30%), and user profile (20%). The `user_profile` is a `UserProfile` with `preferred_languages`, `preferred_topics`, `weighted_tags`.
+
+#### `recommend_popular(all_repositories, top_n=5, sort_key="stars") -> RecommendationSet`
+
+Simple popular recommendations: top-N repos sorted by `sort_key` (stars, forks, etc.).
 
 ### Summary (future)
 
@@ -201,6 +318,10 @@ Compares multiple repositories across dimensions. (Planned.)
 | `SearchHit` | `ai/semantic_search/models.py` | Single search result with score + metadata |
 | `SearchResult` | `ai/semantic_search/models.py` | Complete search response |
 | `IndexStats` | `ai/semantic_search/models.py` | Index statistics |
+| `CandidateRepo` | `ai/ranking/models.py` | Repository candidate with all ranking metrics |
+| `RankingResult` | `ai/ranking/models.py` | Ranked result with per-factor breakdown |
+| `RankedResultSet` | `ai/ranking/models.py` | Complete ranking response |
+| `FactorScore` | `ai/ranking/models.py` | Individual factor score with contribution |
 
 ## Error Handling
 

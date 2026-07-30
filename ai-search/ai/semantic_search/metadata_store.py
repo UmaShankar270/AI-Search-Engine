@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from threading import Lock
-from typing import Optional
+from typing import Any, Optional
 
 from .interfaces import IMetadataStore
 
@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class IndexMetadataStore(IMetadataStore):
-    def __init__(self):
+    def __init__(self) -> None:
         self._repo_to_vector: dict[str, int] = {}
         self._vector_to_repo: dict[int, str] = {}
-        self._metadata: dict[str, dict] = {}
+        self._metadata: dict[str, dict[str, Any]] = {}
         self._lock = Lock()
 
     def add_mapping(
-        self, vector_id: int, repo_id: str, metadata: Optional[dict] = None
+        self, vector_id: int, repo_id: str, metadata: Optional[dict[str, Any]] = None
     ) -> None:
         with self._lock:
             self._repo_to_vector[repo_id] = vector_id
@@ -32,7 +32,7 @@ class IndexMetadataStore(IMetadataStore):
     def get_vector_id(self, repo_id: str) -> Optional[int]:
         return self._repo_to_vector.get(repo_id)
 
-    def get_metadata(self, repo_id: str) -> Optional[dict]:
+    def get_metadata(self, repo_id: str) -> Optional[dict[str, Any]]:
         return self._metadata.get(repo_id)
 
     def repo_exists(self, repo_id: str) -> bool:
@@ -59,7 +59,7 @@ class IndexMetadataStore(IMetadataStore):
             self._metadata.clear()
         logger.info("Cleared metadata store")
 
-    def items(self) -> list[tuple[int, str, Optional[dict]]]:
+    def items(self) -> list[tuple[int, str, Optional[dict[str, Any]]]]:
         result = []
         for repo_id, vector_id in self._repo_to_vector.items():
             result.append((vector_id, repo_id, self._metadata.get(repo_id)))

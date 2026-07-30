@@ -1,11 +1,10 @@
 import logging
-import time
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
-from ai.embeddings.model_manager import ModelManager
 from ai.embeddings.cache import EmbeddingCache
+from ai.embeddings.model_manager import ModelManager
 from ai.embeddings.strategies import CompositionStrategy
 
 logger = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ class EmbeddingGenerator:
         return self._model.model_name
 
     @property
-    def cache_stats(self) -> dict:
+    def cache_stats(self) -> dict[str, Any]:
         return self._cache.stats
 
     def warmup(self) -> None:

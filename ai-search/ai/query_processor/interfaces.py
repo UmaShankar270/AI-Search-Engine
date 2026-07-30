@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import Any
+
 from ai.query_processor.models import (
-    QueryUnderstandingResult,
     ExtractionContext,
     ExtractionResult,
     IntentType,
+    QueryUnderstandingResult,
 )
 
 
@@ -17,14 +19,14 @@ class IQueryUnderstandingEngine(ABC):
 class ISpellingCorrector(ABC):
 
     @abstractmethod
-    def correct(self, text: str, known_terms: set[str]) -> tuple[str, list[dict]]:
+    def correct(self, text: str, known_terms: set[str]) -> tuple[str, list[dict[str, Any]]]:
         pass
 
 
 class ISynonymResolver(ABC):
 
     @abstractmethod
-    def resolve(self, text: str) -> tuple[str, list[dict]]:
+    def resolve(self, text: str) -> tuple[str, list[dict[str, Any]]]:
         pass
 
 

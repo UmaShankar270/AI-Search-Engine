@@ -1,30 +1,30 @@
 import re
 import time
 
+from ai.query_processor.entity_registry import EntityRegistry
+from ai.query_processor.extractors.domain_extractor import DomainExtractor
+from ai.query_processor.extractors.filter_extractor import FilterExtractor
+from ai.query_processor.extractors.intent_extractor import IntentExtractor
+from ai.query_processor.extractors.technology_extractor import TechnologyExtractor
 from ai.query_processor.interfaces import (
+    IExtractor,
     IQueryUnderstandingEngine,
     ISpellingCorrector,
     ISynonymResolver,
-    IExtractor,
 )
 from ai.query_processor.models import (
-    QueryUnderstandingResult,
+    EntityType,
+    ExtractedEntity,
     ExtractionContext,
-    ExtractionResult,
-    IntentType,
-    Technology,
     Filter,
     FilterType,
+    IntentType,
+    QueryUnderstandingResult,
+    Technology,
     TechnologyType,
-    EntityType,
 )
-from ai.query_processor.entity_registry import EntityRegistry
 from ai.query_processor.spelling import SpellingCorrector
 from ai.query_processor.synonyms import SynonymResolver
-from ai.query_processor.extractors.intent_extractor import IntentExtractor
-from ai.query_processor.extractors.domain_extractor import DomainExtractor
-from ai.query_processor.extractors.technology_extractor import TechnologyExtractor
-from ai.query_processor.extractors.filter_extractor import FilterExtractor
 
 
 class QueryUnderstandingEngine(IQueryUnderstandingEngine):
@@ -85,9 +85,9 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
 
         for extractor in self._extractors:
             try:
-                result = extractor.extract(context)
-                all_entities.extend(result.entities)
-                pipeline_confidence += result.confidence
+                extraction_result = extractor.extract(context)
+                all_entities.extend(extraction_result.entities)
+                pipeline_confidence += extraction_result.confidence
                 extractor_count += 1
             except Exception:
                 pass
@@ -117,7 +117,7 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
     def _tokenize(self, text: str) -> list[str]:
         return re.findall(r'[a-zA-Z0-9+#.@/-]+', text.lower())
 
-    def _run_spelling(self, context: ExtractionContext):
+    def _run_spelling(self, context: ExtractionContext) -> None:
         if not self.enable_spelling:
             return
         corrected, corrections = self.corrector.correct(
@@ -135,7 +135,7 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
         else:
             context.corrected_query = context.normalized_query
 
-    def _run_synonyms(self, context: ExtractionContext):
+    def _run_synonyms(self, context: ExtractionContext) -> None:
         if not self.enable_synonyms:
             context.expanded_query = context.corrected_query
             return
@@ -152,8 +152,7 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
             context.expanded_query = context.corrected_query
 
     def _make_entity(self, text: str, etype: EntityType, confidence: float,
-                     source: str, normalized: str | None = None):
-        from ai.query_processor.models import ExtractedEntity
+                     source: str, normalized: str | None = None) -> ExtractedEntity:
         return ExtractedEntity(
             text=text,
             entity_type=etype,
@@ -165,7 +164,7 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
     def _build_result(
         self,
         context: ExtractionContext,
-        entities: list,
+        entities: list[ExtractedEntity],
         confidence: float,
     ) -> QueryUnderstandingResult:
         intent = IntentType.UNKNOWN
@@ -178,7 +177,7 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
         tools = set()
         databases = set()
         platforms = set()
-        filters = []
+        filters: list[Filter] = []
 
         for entity in entities:
             etype = entity.entity_type
@@ -237,7 +236,9 @@ class QueryUnderstandingEngine(IQueryUnderstandingEngine):
                         ftype = FilterType(parts[0])
                         fvalue = parts[1]
                         if not any(f.type == ftype and f.value == fvalue for f in filters):
-                            filters.append(Filter(type=ftype, value=fvalue, original_text=entity.text))
+                            filters.append(
+                                Filter(type=ftype, value=fvalue, original_text=entity.text)
+                            )
                     except ValueError:
                         pass
 

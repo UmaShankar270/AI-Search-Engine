@@ -1,14 +1,18 @@
 import re
+
 from ai.query_processor.interfaces import IIntentExtractor
 from ai.query_processor.models import (
-    IntentType, ExtractionContext, ExtractionResult,
-    ExtractedEntity, EntityType,
+    EntityType,
+    ExtractedEntity,
+    ExtractionContext,
+    ExtractionResult,
+    IntentType,
 )
 
 
 class IntentExtractor(IIntentExtractor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._patterns = {
             IntentType.COMPARE: [
                 r'\bcompare\b', r'\bvs\b', r'\bversus\b',
@@ -55,7 +59,7 @@ class IntentExtractor(IIntentExtractor):
         if scores[IntentType.RECOMMEND] > 0:
             scores[IntentType.SEARCH] *= 0.4
 
-        best_intent = max(scores, key=scores.get)
+        best_intent = max(scores, key=lambda k: scores[k])
         best_score = scores[best_intent]
 
         if best_score < 0.2:

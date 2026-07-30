@@ -1,4 +1,6 @@
 import re
+from typing import Any
+
 from ai.query_processor.interfaces import ISpellingCorrector
 
 
@@ -7,7 +9,7 @@ class SpellingCorrector(ISpellingCorrector):
     def __init__(self, max_distance: int = 2):
         self.max_distance = max_distance
 
-    def correct(self, text: str, known_terms: set[str]) -> tuple[str, list[dict]]:
+    def correct(self, text: str, known_terms: set[str]) -> tuple[str, list[dict[str, Any]]]:
         if not text:
             return text, []
         words = re.findall(r"[a-zA-Z0-9+#.]+", text)

@@ -1,14 +1,17 @@
+from ai.query_processor.entity_registry import EntityRegistry
 from ai.query_processor.interfaces import IExtractor
 from ai.query_processor.models import (
-    ExtractionContext, ExtractionResult,
-    ExtractedEntity, EntityType, Technology, TechnologyType,
+    EntityType,
+    ExtractedEntity,
+    ExtractionContext,
+    ExtractionResult,
+    TechnologyType,
 )
-from ai.query_processor.entity_registry import EntityRegistry
 
 
 class TechnologyExtractor(IExtractor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.registry = EntityRegistry()
 
     def extract(self, context: ExtractionContext) -> ExtractionResult:

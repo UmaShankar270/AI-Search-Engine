@@ -1,14 +1,16 @@
 import re
-from ai.query_processor.interfaces import ISynonymResolver
+from typing import Any
+
 from ai.query_processor.entity_registry import EntityRegistry
+from ai.query_processor.interfaces import ISynonymResolver
 
 
 class SynonymResolver(ISynonymResolver):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.registry = EntityRegistry()
 
-    def resolve(self, text: str) -> tuple[str, list[dict]]:
+    def resolve(self, text: str) -> tuple[str, list[dict[str, Any]]]:
         if not text:
             return text, []
         resolved = []

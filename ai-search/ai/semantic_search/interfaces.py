@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -58,7 +58,7 @@ class IVectorIndex(ABC):
 class IMetadataStore(ABC):
     @abstractmethod
     def add_mapping(
-        self, vector_id: int, repo_id: str, metadata: Optional[dict] = None
+        self, vector_id: int, repo_id: str, metadata: Optional[dict[str, Any]] = None
     ) -> None:
         ...
 
@@ -71,7 +71,7 @@ class IMetadataStore(ABC):
         ...
 
     @abstractmethod
-    def get_metadata(self, repo_id: str) -> Optional[dict]:
+    def get_metadata(self, repo_id: str) -> Optional[dict[str, Any]]:
         ...
 
     @abstractmethod
@@ -91,5 +91,5 @@ class IMetadataStore(ABC):
         ...
 
     @abstractmethod
-    def items(self) -> list[tuple[int, str, Optional[dict]]]:
+    def items(self) -> list[tuple[int, str, Optional[dict[str, Any]]]]:
         ...

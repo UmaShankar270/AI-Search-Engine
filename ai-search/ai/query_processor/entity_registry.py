@@ -3,14 +3,15 @@ from ai.query_processor.models import Technology, TechnologyType
 
 class EntityRegistry:
     _instance = None
+    _initialized: bool
 
-    def __new__(cls):
+    def __new__(cls) -> "EntityRegistry":
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         if self._initialized:
             return
         self._initialized = True
@@ -25,7 +26,7 @@ class EntityRegistry:
         self._abbreviations: dict[str, str] = {}
         self._populate()
 
-    def _populate(self):
+    def _populate(self) -> None:
         self._populate_languages()
         self._populate_frameworks()
         self._populate_libraries()
@@ -36,7 +37,7 @@ class EntityRegistry:
         self._populate_synonyms()
         self._populate_abbreviations()
 
-    def _populate_languages(self):
+    def _populate_languages(self) -> None:
         entries = [
             ("Python", ["py", "python3", "python2"]),
             ("JavaScript", ["js", "nodejs", "node", "ecmascript", "es6", "es2015"]),
@@ -75,12 +76,15 @@ class EntityRegistry:
             ("F#", ["fsharp", "f-sharp"]),
         ]
         for name, aliases in entries:
-            t = Technology(name=name, type=TechnologyType.LANGUAGE, aliases=aliases, category="language")
+            t = Technology(
+                name=name, type=TechnologyType.LANGUAGE,
+                aliases=aliases, category="language",
+            )
             self._languages[name.lower()] = t
             for a in aliases:
                 self._languages[a.lower()] = t
 
-    def _populate_frameworks(self):
+    def _populate_frameworks(self) -> None:
         web_frontend = [
             ("React", ["reactjs", "react.js", "react-js"]),
             ("Vue.js", ["vue", "vuejs", "vue-js", "vue2", "vue3"]),
@@ -182,16 +186,21 @@ class EntityRegistry:
             ("JavaFX", ["javafx-framework"]),
             ("Swing", ["swing-framework"]),
         ]
-        all_entries = web_frontend + web_backend + mobile + data_science + testing + desktop
-        for name, aliases in entries if False else []:
+        all_entries: list[tuple[str, list[str]]] = (
+            web_frontend + web_backend + mobile + data_science + testing + desktop
+        )
+        for name, aliases in all_entries if False else []:  # type: ignore[var-annotated]
             pass
         for name, aliases in all_entries:
-            t = Technology(name=name, type=TechnologyType.FRAMEWORK, aliases=aliases, category="framework")
+            t = Technology(
+                name=name, type=TechnologyType.FRAMEWORK,
+                aliases=aliases, category="framework",
+            )
             self._frameworks[name.lower()] = t
             for a in aliases:
                 self._frameworks[a.lower()] = t
 
-    def _populate_libraries(self):
+    def _populate_libraries(self) -> None:
         entries = [
             ("Lodash", ["lodash-lib", "underscore"]),
             ("Axios", ["axios-lib"]),
@@ -252,12 +261,15 @@ class EntityRegistry:
             ("Scrapy", ["scrapy-framework"]),
         ]
         for name, aliases in entries:
-            t = Technology(name=name, type=TechnologyType.LIBRARY, aliases=aliases, category="library")
+            t = Technology(
+                name=name, type=TechnologyType.LIBRARY,
+                aliases=aliases, category="library",
+            )
             self._libraries[name.lower()] = t
             for a in aliases:
                 self._libraries[a.lower()] = t
 
-    def _populate_tools(self):
+    def _populate_tools(self) -> None:
         entries = [
             ("Git", ["vcs", "version-control"]),
             ("Docker", ["dockerize", "container"]),
@@ -287,7 +299,7 @@ class EntityRegistry:
             for a in aliases:
                 self._tools[a.lower()] = t
 
-    def _populate_databases(self):
+    def _populate_databases(self) -> None:
         entries = [
             ("PostgreSQL", ["postgres", "psql", "pgsql"]),
             ("MySQL", ["mysql-db"]),
@@ -315,12 +327,15 @@ class EntityRegistry:
             ("Chroma", ["chroma-vector"]),
         ]
         for name, aliases in entries:
-            t = Technology(name=name, type=TechnologyType.DATABASE, aliases=aliases, category="database")
+            t = Technology(
+                name=name, type=TechnologyType.DATABASE,
+                aliases=aliases, category="database",
+            )
             self._databases[name.lower()] = t
             for a in aliases:
                 self._databases[a.lower()] = t
 
-    def _populate_platforms(self):
+    def _populate_platforms(self) -> None:
         entries = [
             ("Linux", ["gnu-linux", "ubuntu", "debian", "centos", "fedora", "arch", "alpine"]),
             ("macOS", ["mac", "osx", "mac-os", "darwin"]),
@@ -342,12 +357,15 @@ class EntityRegistry:
             ("Edge", ["edge-computing", "edge-network"]),
         ]
         for name, aliases in entries:
-            t = Technology(name=name, type=TechnologyType.PLATFORM, aliases=aliases, category="platform")
+            t = Technology(
+                name=name, type=TechnologyType.PLATFORM,
+                aliases=aliases, category="platform",
+            )
             self._platforms[name.lower()] = t
             for a in aliases:
                 self._platforms[a.lower()] = t
 
-    def _populate_categories(self):
+    def _populate_categories(self) -> None:
         categories = [
             ("video editor", "video editing", "Video Editing Software"),
             ("video editing", "video editing", "Video Editing Software"),
@@ -448,7 +466,7 @@ class EntityRegistry:
             self._categories[term.lower()] = domain
             self._categories[display_name.lower()] = domain
 
-    def _populate_synonyms(self):
+    def _populate_synonyms(self) -> None:
         self._synonyms = {
             "ai": "artificial intelligence",
             "ml": "machine learning",
@@ -515,7 +533,7 @@ class EntityRegistry:
             "ide": "integrated development environment",
         }
 
-    def _populate_abbreviations(self):
+    def _populate_abbreviations(self) -> None:
         self._abbreviations = {
             "app": "application",
             "repo": "repository",
@@ -560,8 +578,11 @@ class EntityRegistry:
 
     @property
     def all_known_terms(self) -> set[str]:
-        terms = set()
-        for d in [self._languages, self._frameworks, self._libraries, self._tools, self._databases, self._platforms]:
+        terms: set[str] = set()
+        for d in [
+            self._languages, self._frameworks, self._libraries,
+            self._tools, self._databases, self._platforms,
+        ]:
             terms.update(d.keys())
         terms.update(self._categories.keys())
         terms.update(self._synonyms.keys())
@@ -570,7 +591,10 @@ class EntityRegistry:
 
     def resolve_entity(self, term: str) -> Technology | None:
         key = term.lower().strip()
-        for lookup in [self._languages, self._frameworks, self._libraries, self._tools, self._databases, self._platforms]:
+        for lookup in [
+            self._languages, self._frameworks, self._libraries,
+            self._tools, self._databases, self._platforms,
+        ]:
             if key in lookup:
                 return lookup[key]
         return None

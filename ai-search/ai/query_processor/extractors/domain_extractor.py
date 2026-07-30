@@ -1,15 +1,18 @@
 import re
+
+from ai.query_processor.entity_registry import EntityRegistry
 from ai.query_processor.interfaces import IExtractor
 from ai.query_processor.models import (
-    ExtractionContext, ExtractionResult,
-    ExtractedEntity, EntityType,
+    EntityType,
+    ExtractedEntity,
+    ExtractionContext,
+    ExtractionResult,
 )
-from ai.query_processor.entity_registry import EntityRegistry
 
 
 class DomainExtractor(IExtractor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.registry = EntityRegistry()
 
     def extract(self, context: ExtractionContext) -> ExtractionResult:
