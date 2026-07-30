@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal } from 'lucide-react';
-import { mockRepositories } from '../data/mockRepositories';
+import { searchRepositories } from '../services/api';
 
 // Components
 import SearchHeader from '../components/SearchBar/SearchHeader';
@@ -48,48 +48,33 @@ export default function Search() {
     setError(null);
     setCurrentPage(1);
 
-    const timer = setTimeout(() => {
+    let active = true;
+
+    async function fetchSearch() {
       try {
         if (queryParam.toLowerCase() === 'error') {
           throw new Error('Simulation API error');
         }
-
-        const searchTerms = queryParam.toLowerCase().split(' ');
-        const matched = mockRepositories.map((repo) => {
-          let matches = 0;
-          const searchSource = `${repo.name} ${repo.owner} ${repo.description} ${repo.language} ${repo.topics.join(' ')}`.toLowerCase();
-          
-          searchTerms.forEach((term) => {
-            if (searchSource.includes(term)) {
-              matches += 1;
-            }
-          });
-
-          let baseScore = repo.matchScore;
-          if (matches === 0) {
-            baseScore = Math.max(30, repo.matchScore - 45);
-          } else {
-            baseScore = Math.min(100, repo.matchScore + matches * 3);
-          }
-
-          return { ...repo, matchScore: baseScore };
-        });
-
-        const filtered = matched.filter((repo) => {
-          const searchSource = `${repo.name} ${repo.owner} ${repo.description} ${repo.language}`.toLowerCase();
-          const hasKeyword = searchTerms.some((t) => searchSource.includes(t));
-          return hasKeyword || repo.matchScore > 60;
-        });
-
-        setRepositories(filtered);
+        const data = await searchRepositories(queryParam, filters);
+        if (active) {
+          setRepositories(data);
+        }
       } catch (err) {
-        setError('Failed to fetch repositories due to an unexpected API error.');
+        if (active) {
+          setError('Failed to fetch repositories due to an unexpected API error.');
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
-    }, 700);
+    }
 
-    return () => clearTimeout(timer);
+    fetchSearch();
+
+    return () => {
+      active = false;
+    };
   }, [queryParam]);
 
   const handleSearch = (e) => {
