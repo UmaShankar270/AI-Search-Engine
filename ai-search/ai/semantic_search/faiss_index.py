@@ -47,6 +47,7 @@ class FAISSVectorIndex(IVectorIndex):
         else:
             raise ValueError(f"Unsupported metric: {self._metric}")
 
+        base: Any = None
         if self._index_type == "flat":
             base = faiss.IndexFlat(self._dimension, metric)
         elif self._index_type == "ivf":
@@ -64,7 +65,8 @@ class FAISSVectorIndex(IVectorIndex):
     def _normalize(self, vectors: np.ndarray) -> np.ndarray:
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)
         norms = np.maximum(norms, self.NORMALIZE_EPS)
-        return vectors / norms
+        result: np.ndarray = vectors / norms
+        return result
 
     def _ensure_contiguous(self, vectors: np.ndarray) -> np.ndarray:
         return np.ascontiguousarray(vectors, dtype=np.float32)

@@ -46,7 +46,7 @@ class EmbeddingGenerator:
             cached = self._cache.get(text)
             if cached is not None:
                 return cached
-        embedding = self._encode([text])[0]
+        embedding: np.ndarray = self._encode([text])[0]
         if self._use_cache:
             self._cache.set(text, embedding)
         return embedding

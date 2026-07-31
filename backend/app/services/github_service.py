@@ -1,11 +1,12 @@
 import requests
 
+
 def search_repositories(query: str):
     url = "https://api.github.com/search/repositories"
 
     response = requests.get(
         url,
-        params={"q": query, "per_page": 10}
+        params={"q": query, "per_page": "10"}
     )
 
     data = response.json()

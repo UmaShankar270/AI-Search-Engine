@@ -3,7 +3,9 @@ from typing import Any, Optional
 
 import numpy as np
 
+from ai.duplicate_detection.detector import DuplicateDetector
 from ai.embeddings.generator import EmbeddingGenerator
+from ai.models.comparison import ComparisonResult
 from ai.query_processor.engine import QueryUnderstandingEngine
 from ai.query_processor.models import QueryUnderstandingResult
 from ai.ranking.models import CandidateRepo, RankedResultSet
@@ -14,6 +16,7 @@ from ai.semantic_search.faiss_index import FAISSVectorIndex
 from ai.semantic_search.metadata_store import IndexMetadataStore
 from ai.semantic_search.models import IndexStats, SearchResult
 from ai.semantic_search.search_engine import SemanticSearchEngine
+from ai.summarizer.summarizer import SummaryGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +48,8 @@ class AIFacade:
         self._recommendation_engine = RecommendationEngine(
             embedding_generator=self._embedding_generator,
         )
+        self._summarizer = SummaryGenerator()
+        self._duplicate_detector = DuplicateDetector()
 
     # --- Query Understanding ---
 
@@ -346,10 +351,15 @@ class AIFacade:
                 logger.exception("Failed to generate embedding for %s", repo_id)
         return result
 
-    # --- Stubs for future phases ---
+    # --- Summarization & Comparison ---
 
-    def summarize(self, repository: Any) -> None:
-        pass
+    def summarize(self, repository: Any) -> str:
+        return self._summarizer.generate(repository)
 
-    def compare(self, repositories: list[Any]) -> None:
-        pass
+    def compare(self, repositories: list[Any]) -> ComparisonResult:
+        return self._summarizer.compare(repositories)
+
+    # --- Duplicate Detection ---
+
+    def deduplicate(self, repositories: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return self._duplicate_detector.deduplicate(repositories)

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from app.services.github_service import search_repositories
 
 router = APIRouter()

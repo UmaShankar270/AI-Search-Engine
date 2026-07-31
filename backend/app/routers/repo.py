@@ -1,5 +1,5 @@
-from fastapi import APIRouter
 import requests
+from fastapi import APIRouter
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ def trending():
             "q": "stars:>10000",
             "sort": "stars",
             "order": "desc",
-            "per_page": 10
+            "per_page": "10"
         }
     )
 

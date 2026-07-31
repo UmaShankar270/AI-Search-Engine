@@ -364,7 +364,7 @@ class TestModelManager:
         from ai.embeddings.model_manager import ModelManager
         mgr = ModelManager.__new__(ModelManager)
         mgr._initialized = False
-        mgr.__init__()
+        ModelManager.__init__(mgr)
         dim = mgr.dim
         assert dim > 0
 
@@ -372,5 +372,5 @@ class TestModelManager:
         from ai.embeddings.model_manager import ModelManager
         m = ModelManager.__new__(ModelManager)
         m._initialized = False
-        m.__init__()
+        ModelManager.__init__(m)
         assert not m.is_loaded()
