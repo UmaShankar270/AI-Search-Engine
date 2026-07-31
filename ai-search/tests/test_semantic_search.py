@@ -442,9 +442,16 @@ class TestSemanticSearchEngine:
             engine2.load(path)
             assert engine2._vector_index.size == 20
             assert engine2._vector_index.dim == DIM
+            assert engine2._metadata_store.size() == 20
+            repo_0_hash = FAISSVectorIndex.hash_id("repo-0")
+            assert engine2._metadata_store.get_repo_id(repo_0_hash) == "repo-0"
         finally:
+
             if os.path.exists(path):
                 os.remove(path)
+            if os.path.exists(path + ".json"):
+                os.remove(path + ".json")
+
 
 
 # ===================================================================
@@ -517,7 +524,7 @@ class TestIntegration:
         assert len(result.results) == 10
 
     def test_vector_count_preserved_across_save(self) -> None:
-        """FAISS save/load preserves vector count (metadata not persisted)."""
+        """FAISS save/load preserves vector count and metadata is persisted."""
         index = FAISSVectorIndex(dimension=DIM)
         store = IndexMetadataStore()
         engine = SemanticSearchEngine(index, store, encoder=dummy_encoder)
@@ -535,9 +542,13 @@ class TestIntegration:
             engine2.load(path)
             assert engine2._vector_index.size == 2
             assert engine2._vector_index.dim == DIM
+            assert engine2._metadata_store.get_metadata("s1") == {"name": "SaveTest"}
         finally:
             if os.path.exists(path):
                 os.remove(path)
+            if os.path.exists(path + ".json"):
+                os.remove(path + ".json")
+
 
     def test_empty_index_search(self) -> None:
         engine = SemanticSearchEngine(

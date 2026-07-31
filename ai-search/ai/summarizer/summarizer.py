@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from typing import Any, Optional
@@ -31,11 +30,13 @@ class SummaryGenerator:
             api_key = self.settings.gemini_api_key
             base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
             model = self.settings.gemini_model
+        else:
             logger.warning(
                 "Unsupported LLM provider '%s'. Falling back to mock summaries.",
                 provider,
             )
             return
+
 
         if api_key:
             try:
@@ -135,34 +136,22 @@ class SummaryGenerator:
         if not repositories:
             return []
 
-        # Run generate() inside asyncio executor or direct loops.
-        # Since standard generate calls are network-bound, we wrap them in a helper.
-        async def _generate_async(repo: Any) -> str:
-            return await asyncio.to_thread(self.generate, repo)
+        # Use ThreadPoolExecutor to run generate() concurrently across threads
+        # without scheduling on the asyncio event loop. This prevents deadlock.
+        from concurrent.futures import ThreadPoolExecutor
 
-        async def run_batch() -> list[Any]:
-            tasks = [_generate_async(repo) for repo in repositories]
-            return list(await asyncio.gather(*tasks, return_exceptions=True))
+        max_workers = min(len(repositories), 10)
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self.generate, repo) for repo in repositories]
+            results = []
+            for fut in futures:
+                try:
+                    results.append(fut.result())
+                except Exception as exc:
+                    logger.warning("Batch summary item failed: %s", str(exc))
+                    results.append("Summary generation failed due to a transient API error.")
+        return results
 
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop and loop.is_running():
-            # In an active event loop, run as thread task
-            results = asyncio.run_coroutine_threadsafe(run_batch(), loop).result()
-        else:
-            results = asyncio.run(run_batch())
-
-        final_summaries = []
-        for res in results:
-            if isinstance(res, Exception):
-                logger.warning("Batch summary item failed: %s", str(res))
-                final_summaries.append("Summary generation failed due to a transient API error.")
-            else:
-                final_summaries.append(res)
-        return final_summaries
 
     def compare(self, repositories: list[Any]) -> ComparisonResult:
         """Generate comparative analysis of multiple repositories."""

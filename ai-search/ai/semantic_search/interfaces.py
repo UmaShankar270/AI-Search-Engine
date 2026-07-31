@@ -93,3 +93,12 @@ class IMetadataStore(ABC):
     @abstractmethod
     def items(self) -> list[tuple[int, str, Optional[dict[str, Any]]]]:
         ...
+
+    @abstractmethod
+    def save(self, path: str) -> None:
+        ...
+
+    @abstractmethod
+    def load(self, path: str) -> None:
+        ...
+

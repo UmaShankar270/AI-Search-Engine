@@ -298,9 +298,12 @@ class SemanticSearchEngine:
 
     def save(self, path: str) -> None:
         self._vector_index.save(path)
+        self._metadata_store.save(path + ".json")
 
     def load(self, path: str) -> None:
         self._vector_index.load(path)
+        self._metadata_store.load(path + ".json")
+
 
     def clear(self) -> None:
         self._vector_index.clear()

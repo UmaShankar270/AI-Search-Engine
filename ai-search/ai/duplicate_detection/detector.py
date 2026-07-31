@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+from ai.utils.text_utils import TextUtils
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,21 +13,6 @@ class DuplicateDetector:
         self.name_threshold = name_threshold
         self.desc_threshold = desc_threshold
 
-    def _levenshtein(self, s1: str, s2: str) -> int:
-        """Compute the Levenshtein distance between two strings."""
-        if len(s1) < len(s2):
-            s1, s2 = s2, s1
-        if len(s2) == 0:
-            return len(s1)
-        prev = list(range(len(s2) + 1))
-        for i, c1 in enumerate(s1):
-            curr = [i + 1]
-            for j, c2 in enumerate(s2):
-                cost = 0 if c1 == c2 else 1
-                curr.append(min(curr[-1] + 1, prev[j + 1] + 1, prev[j] + cost))
-            prev = curr
-        return prev[-1]
-
     def _str_similarity(self, s1: str, s2: str) -> float:
         """Compute the normalized similarity score between two strings [0.0 - 1.0]."""
         if not s1 or not s2:
@@ -34,7 +21,8 @@ class DuplicateDetector:
         s2_clean = s2.strip().lower()
         if s1_clean == s2_clean:
             return 1.0
-        dist = self._levenshtein(s1_clean, s2_clean)
+        dist = TextUtils.levenshtein_distance(s1_clean, s2_clean)
+
         max_len = max(len(s1_clean), len(s2_clean))
         return 1.0 - (dist / max_len)
 

@@ -33,7 +33,11 @@ class FAISSVectorIndex(IVectorIndex):
 
     @staticmethod
     def hash_id(repo_id: str) -> int:
-        return int(hash(repo_id)) & 0x7FFFFFFFFFFFFFFF
+        import hashlib
+        h = hashlib.sha256(repo_id.encode("utf-8")).digest()
+        val = int.from_bytes(h[:8], byteorder="big")
+        return val & 0x7FFFFFFFFFFFFFFF
+
 
     def _lazy_init_index(self) -> None:
         if self._index is not None:

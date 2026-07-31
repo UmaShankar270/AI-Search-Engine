@@ -81,8 +81,11 @@ class RankingService:
         candidates: list[CandidateRepo],
         cross_encoder_fn: Any,
     ) -> RankedResultSet:
+        import copy
+        copied_candidates = [copy.copy(c) for c in candidates]
+
         texts = []
-        for repo in candidates:
+        for repo in copied_candidates:
             parts = [repo.repo_id]
             if repo.topics:
                 parts.extend(repo.topics)
@@ -92,13 +95,13 @@ class RankingService:
 
         try:
             cross_scores = cross_encoder_fn(query, texts)
-            for i, repo in enumerate(candidates):
+            for i, repo in enumerate(copied_candidates):
                 if i < len(cross_scores):
-                    candidates[i].semantic_score = float(cross_scores[i])
+                    copied_candidates[i].semantic_score = float(cross_scores[i])
         except Exception as e:
             logger.warning("Cross-encoder reranking failed: %s", str(e))
 
-        return self.rank(query, candidates)
+        return self.rank(query, copied_candidates)
 
     def rerank_with_llm(
         self,
@@ -106,15 +109,19 @@ class RankingService:
         candidates: list[CandidateRepo],
         llm_fn: Any,
     ) -> RankedResultSet:
+        import copy
+        copied_candidates = [copy.copy(c) for c in candidates]
+
         try:
-            llm_scores = llm_fn(query, candidates)
-            for i, repo in enumerate(candidates):
+            llm_scores = llm_fn(query, copied_candidates)
+            for i, repo in enumerate(copied_candidates):
                 if i < len(llm_scores):
-                    candidates[i].semantic_score = float(llm_scores[i])
+                    copied_candidates[i].semantic_score = float(llm_scores[i])
         except Exception as e:
             logger.warning("LLM reranking failed, using existing scores: %s", str(e))
 
-        return self.rank(query, candidates)
+        return self.rank(query, copied_candidates)
+
 
     def get_weight_summary(self) -> dict[str, Any]:
         return {

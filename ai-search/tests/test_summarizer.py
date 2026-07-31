@@ -121,3 +121,39 @@ class TestSummaryGenerator:
         summary = gen.generate(repo)
         assert summary == "Mocked LLM summary for fastapi."
         mock_client.chat.completions.create.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_generate_batch_async_no_deadlock(self, generator: SummaryGenerator) -> None:
+        """Verify generate_batch runs concurrently in async context without deadlocking."""
+        repos = [
+            {"name": "fastapi", "description": "Modern API framework"},
+            {"name": "django", "description": "Classic web framework"},
+        ]
+        # In pytest-asyncio, this runs inside a running event loop.
+        # It must complete successfully without hanging or raising exceptions.
+        summaries = generator.generate_batch(repos)
+        assert len(summaries) == 2
+        assert "fastapi" in summaries[0]
+        assert "django" in summaries[1]
+
+    @patch("openai.OpenAI")
+    def test_gemini_client_initialization(self, mock_openai_class: MagicMock) -> None:
+        """Verify Gemini client is correctly initialized with the proper endpoint."""
+        mock_client = MagicMock()
+        mock_openai_class.return_value = mock_client
+
+        custom_settings = Settings(
+            gemini_api_key="gemini-test-key",
+            llm_provider="gemini",
+            gemini_model="gemini-2.0-flash"
+        )
+        gen = SummaryGenerator(settings=custom_settings)
+
+        assert gen._client is not None
+        assert gen._model == "gemini-2.0-flash"
+        mock_openai_class.assert_called_once_with(
+            api_key="gemini-test-key",
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
+
+
