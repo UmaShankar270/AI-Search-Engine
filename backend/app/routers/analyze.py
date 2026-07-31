@@ -3,6 +3,8 @@ from base64 import b64decode
 import requests
 from fastapi import APIRouter, HTTPException
 
+from app.services.ai_service import summarize
+
 router = APIRouter()
 
 
@@ -20,7 +22,10 @@ def analyze_repository(owner: str, repo: str):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Repository or README not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Repository or README not found"
+            )
 
         raise HTTPException(
             status_code=response.status_code,
@@ -36,20 +41,27 @@ def analyze_repository(owner: str, repo: str):
     readme_content = payload.get("content")
 
     if not readme_content:
-        raise HTTPException(status_code=404, detail="README content is unavailable")
+        raise HTTPException(
+            status_code=404,
+            detail="README content is unavailable"
+        )
 
     try:
         clean_content = readme_content.replace("\n", "")
-        decoded = b64decode(clean_content).decode("utf-8", errors="replace")
+        decoded = b64decode(clean_content).decode(
+            "utf-8",
+            errors="replace"
+        )
     except Exception as e:
-        print("Decode Error:", e)
         raise HTTPException(
-        status_code=500,
-        detail=f"Failed to decode README content: {str(e)}"
-    )
+            status_code=500,
+            detail=f"Failed to decode README content: {str(e)}"
+        )
+
+    summary = summarize(decoded)
 
     return {
         "repository": f"{owner}/{repo}",
-        "summary": decoded[:500],
+        "summary": summary,
         "readme_length": len(decoded)
     }

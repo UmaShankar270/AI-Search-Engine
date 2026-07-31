@@ -1,9 +1,16 @@
 import requests
+<<<<<<< HEAD
 from fastapi import APIRouter, HTTPException
+=======
+from app.models.repository import RepositoryResponse
+>>>>>>> e0ea162 (Added analytics, favorites, history, trending repositories, pagination, caching and database models)
 
 router = APIRouter()
 
-@router.get("/repo/{owner}/{repo}")
+@router.get(
+    "/repo/{owner}/{repo}",
+    response_model=RepositoryResponse
+)
 def repo_details(owner: str, repo: str):
 
     url = f"https://api.github.com/repos/{owner}/{repo}"
