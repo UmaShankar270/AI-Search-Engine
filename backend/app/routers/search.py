@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.database_models import SearchHistory, SearchCache
@@ -11,17 +11,22 @@ router = APIRouter()
 
 @router.get("/search")
 def search(
-    query: str,
+    query: str = None,
+    q: str = None,
     language: str = None,
     page: int = 1,
     per_page: int = 10,
     db: Session = Depends(get_db)
 ):
-    history = SearchHistory(query=query)
+    effective_query = query or q
+    if not effective_query:
+        raise HTTPException(status_code=422, detail="Query is required")
+
+    history = SearchHistory(query=effective_query)
     db.add(history)
     db.commit()
 
-    cache_key = f"{query}_{language}_{page}_{per_page}"
+    cache_key = f"{effective_query}_{language}_{page}_{per_page}"
 
     cached = (
         db.query(SearchCache)
@@ -36,7 +41,7 @@ def search(
         }
 
     results = search_repositories(
-        query=query,
+        query=effective_query,
         language=language,
         page=page,
         per_page=per_page

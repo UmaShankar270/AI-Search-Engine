@@ -4,8 +4,7 @@ import { getGeneratedMockDetails } from '../data/mockRepositoryDetails';
 import { getComparisonSummary } from '../data/mockComparison';
 import { mockTrendingRepositories } from '../data/mockTrendingRepositories';
 
-// Create a reusable Axios instance
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8010';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -14,6 +13,79 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const toNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeRepository = (repo, fallbackOwner = 'unknown', fallbackRepo = 'repository') => {
+  const owner = repo.owner || repo.full_name?.split('/')[0] || fallbackOwner;
+  const name = repo.name || repo.full_name?.split('/')[1] || fallbackRepo;
+  const description = repo.description || 'No description available.';
+  const stars = toNumber(repo.stars ?? repo.stargazers_count, 0);
+  const forks = toNumber(repo.forks ?? repo.forks_count, 0);
+  const openIssues = toNumber(repo.openIssues ?? repo.open_issues ?? repo.open_issues_count, 0);
+  const language = repo.language || 'Unknown';
+  const avatar = repo.avatar || `https://github.com/${owner}.png`;
+  const lastUpdated = repo.lastUpdated || repo.updated_at || repo.pushed_at || null;
+  const topics = Array.isArray(repo.topics) ? repo.topics : [];
+  const id = repo.id || `${owner}/${name}`;
+
+  return {
+    id,
+    owner,
+    name,
+    fullName: repo.full_name || `${owner}/${name}`,
+    description,
+    stars,
+    forks,
+    openIssues,
+    license: repo.license || null,
+    language,
+    avatar,
+    lastUpdated,
+    topics,
+    url: repo.url || repo.html_url || `https://github.com/${owner}/${name}`,
+    matchScore: repo.matchScore ?? 0,
+    matchReasonBullets: repo.matchReasonBullets || [],
+    size: repo.size || null,
+    defaultBranch: repo.defaultBranch || 'main',
+    latestRelease: repo.latestRelease || null,
+    visibility: repo.visibility || 'Public',
+    createdDate: repo.createdDate || repo.created_at || null,
+    about: repo.about || description,
+    homepageUrl: repo.homepageUrl || repo.homepage || null,
+    readmeHtml: repo.readmeHtml || '',
+    aiAnalysis: repo.aiAnalysis || null,
+    contributors: repo.contributors || [],
+    activity: repo.activity || null,
+    watchers: repo.watchers ?? repo.watchers_count ?? Math.round(stars * 0.08),
+    open_issues: repo.open_issues ?? openIssues,
+  };
+};
+
+const normalizeSearchResponse = (payload) => {
+  const results = Array.isArray(payload?.results) ? payload.results : Array.isArray(payload) ? payload : [];
+  return results.map((repo) => normalizeRepository(repo));
+};
+
+const normalizeTrendingResponse = (payload) => {
+  const results = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : [];
+  return results.map((repo) => {
+    const normalized = normalizeRepository(repo);
+    return {
+      ...normalized,
+      aiPopularityScore: repo.aiPopularityScore ?? repo.ai_score ?? Math.max(70, normalized.stars > 1000 ? 90 : 80),
+      totalStars: normalized.stars,
+      forks: normalized.forks,
+      starsToday: repo.starsToday ?? Math.max(1, Math.round(normalized.stars * 0.01)),
+      updatedDate: normalized.lastUpdated,
+      owner: normalized.owner,
+      name: normalized.name,
+    };
+  });
+};
 
 /**
  * Helper to log errors for debugging without crashing the UI.
@@ -33,16 +105,17 @@ export async function searchRepositories(query, filters = {}) {
     const response = await apiClient.get('/search', {
       params: { q: query, ...filters },
     });
-    return response.data;
+    const payload = response.data;
+    const normalized = normalizeSearchResponse(payload);
+    return normalized;
   } catch (error) {
     logApiError('searchRepositories', error);
 
-    // Fallback logic representing backend matching
     const searchTerms = query.toLowerCase().split(' ');
     const matched = mockRepositories.map((repo) => {
       let matches = 0;
       const searchSource = `${repo.name} ${repo.owner} ${repo.description} ${repo.language} ${repo.topics.join(' ')}`.toLowerCase();
-      
+
       searchTerms.forEach((term) => {
         if (searchSource.includes(term)) {
           matches += 1;
@@ -75,10 +148,12 @@ export async function searchRepositories(query, filters = {}) {
 export async function getRepositoryDetails(owner, repo) {
   try {
     const response = await apiClient.get(`/repo/${owner}/${repo}`);
-    return response.data;
+    const payload = response.data;
+    return normalizeRepository(payload, owner, repo);
   } catch (error) {
     logApiError('getRepositoryDetails', error);
-    return getGeneratedMockDetails(owner, repo);
+    const generated = getGeneratedMockDetails(owner, repo);
+    return normalizeRepository(generated, owner, repo);
   }
 }
 
@@ -106,17 +181,16 @@ export async function compareRepositories(repoA, repoB) {
 export async function getTrendingRepositories(filters = {}) {
   try {
     const response = await apiClient.get('/trending', { params: filters });
-    return response.data;
+    return normalizeTrendingResponse(response.data);
   } catch (error) {
     logApiError('getTrendingRepositories', error);
-    
-    // Fallback filters logic
+
     let result = [...mockTrendingRepositories];
     if (filters.language && filters.language !== 'All') {
       result = result.filter(
         (repo) => repo.language?.toLowerCase() === filters.language.toLowerCase()
       );
     }
-    return result;
+    return result.map((repo) => normalizeRepository(repo));
   }
 }

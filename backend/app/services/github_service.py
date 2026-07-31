@@ -18,7 +18,8 @@ def search_repositories(
             "q": query,
             "page": page,
             "per_page": per_page
-        }
+        },
+        timeout=10
     )
 
     data = response.json()
