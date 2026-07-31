@@ -1,17 +1,17 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 
 from ai.facade import AIFacade
 from ai.models.exceptions import AIModuleError
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
-from app.routers.search import router as search_router
-from app.routers.repo import router as repo_router
-from app.routers.repo_details import router as repo_details_router
+from app.routers.analyze import router as analyze_router
 from app.routers.compare import router as compare_router
 from app.routers.recommend import router as recommend_router
-from app.routers.analyze import router as analyze_router
+from app.routers.repo import router as repo_router
+from app.routers.repo_details import router as repo_details_router
+from app.routers.search import router as search_router
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

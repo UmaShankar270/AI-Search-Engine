@@ -1,7 +1,7 @@
 from base64 import b64decode
 
-from fastapi import APIRouter, HTTPException
 import requests
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
@@ -12,7 +12,11 @@ def analyze_repository(owner: str, repo: str):
     url = f"https://api.github.com/repos/{owner}/{repo}/readme"
 
     try:
-        response = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, timeout=10)
+        response = requests.get(
+            url,
+            headers={"Accept": "application/vnd.github.v3+json"},
+            timeout=10
+        )
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
