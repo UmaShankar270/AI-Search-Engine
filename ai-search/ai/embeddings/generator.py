@@ -54,27 +54,28 @@ class EmbeddingGenerator:
     def generate_batch(self, texts: list[str]) -> np.ndarray:
         if not texts:
             return np.empty((0, self._model.dim), dtype=np.float32)
-        results = np.empty((len(texts), self._model.dim), dtype=np.float32)
+        results = np.zeros((len(texts), self._model.dim), dtype=np.float32)
         uncached_indices = []
         uncached_texts = []
-        if self._use_cache:
-            for i, text in enumerate(texts):
-                cached = self._cache.get(text) if text else None
+        for i, text in enumerate(texts):
+            if not text:
+                continue
+            if self._use_cache:
+                cached = self._cache.get(text)
                 if cached is not None:
                     results[i] = cached
                 else:
-                    results[i] = np.zeros(self._model.dim, dtype=np.float32)
                     uncached_indices.append(i)
                     uncached_texts.append(text)
-        else:
-            uncached_indices = list(range(len(texts)))
-            uncached_texts = texts
+            else:
+                uncached_indices.append(i)
+                uncached_texts.append(text)
         if uncached_texts:
             encoded = self._encode(uncached_texts)
             for idx, vec in zip(uncached_indices, encoded):
                 results[idx] = vec
-                if self._use_cache and uncached_texts:
-                    self._cache.set(uncached_texts[uncached_indices.index(idx)], vec)
+                if self._use_cache:
+                    self._cache.set(texts[idx], vec)
         return results
 
     def generate_for_query(self, query: str) -> np.ndarray:

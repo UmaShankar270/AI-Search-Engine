@@ -7,11 +7,22 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+import os
+from dotenv import load_dotenv
+
 BACKEND_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = BACKEND_DIR.parent
+PROJECT_ROOT = BACKEND_DIR.parent.parent   # Go up to AI-Search-Engine
 AI_SEARCH_DIR = PROJECT_ROOT / "ai-search"
+
+# Load environment configurations
+load_dotenv(BACKEND_DIR / ".env")
+
+# Force Hugging Face offline mode to prevent Windows socket access violations in Python 3.14
+os.environ["HF_HUB_OFFLINE"] = "1"
+
 if str(AI_SEARCH_DIR) not in sys.path:
     sys.path.insert(0, str(AI_SEARCH_DIR))
+
 
 try:
     from ai.facade import AIFacade
@@ -121,8 +132,11 @@ app.include_router(analytics_router)
 
 
 @app.get("/")
-def root():
+def root(request: Request):
+    ai_facade = getattr(request.app.state, "ai_facade", None)
     return {
         "status": "success",
-        "message": "Backend Running Successfully"
+        "message": "Backend Running Successfully",
+        "ai_facade_loaded": ai_facade is not None,
+        "ai_facade_type": str(type(ai_facade)) if ai_facade else None
     }

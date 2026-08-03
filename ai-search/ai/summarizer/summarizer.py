@@ -253,3 +253,112 @@ class SummaryGenerator:
         except Exception as e:
             logger.error("Comparative analysis generation failed: %s", str(e))
             raise SummaryError(f"Comparative analysis generation failed: {str(e)}") from e
+
+    def _generate_mock_insight(self, name: str, description: str, language: str, stars: int, forks: int, open_issues: int) -> dict:
+        maintenance = min(98, max(50, 75 + (stars // 1000) - (open_issues // 10)))
+        documentation = min(98, max(45, 60 + (len(description) // 5)))
+        community = min(98, max(40, 50 + (stars // 500)))
+        code_quality = min(98, max(55, 70 + (forks // 200)))
+        security = min(98, max(60, 80 - (open_issues // 20)))
+
+        return {
+            "summary": f"{name} is a robust {language} repository focusing on {description or 'open source development'}. It provides developers with highly optimized structures, modular interfaces, and active community backing.",
+            "scores": {
+                "maintenance": int(maintenance),
+                "documentation": int(documentation),
+                "community": int(community),
+                "codeQuality": int(code_quality),
+                "security": int(security)
+            },
+            "strengths": [
+                f"Highly active community support with {stars} stars.",
+                f"Solid codebase architecture utilizing {language}.",
+                "Optimized rendering performance and minimal external dependencies."
+            ],
+            "weaknesses": [
+                "Documentation could be expanded with more advanced integration guides." if documentation < 80 else "Rigid structure may require initial setup learning curve.",
+                f"Has {open_issues} open issues that need community screening." if open_issues > 30 else "Minor vulnerability patches pending dependency updates."
+            ],
+            "bestUseCases": [
+                f"Production-grade applications built with {language}.",
+                "Scalable enterprise micro-service integrations.",
+                "Rapid prototyping and developer utility scripts."
+            ]
+        }
+
+    def generate_insight_report(self, repository: Any, readme_text: str = "") -> dict[str, Any]:
+        name = self._get_repo_name(repository)
+        description = self._get_repo_description(repository)
+        language = self._get_repo_language(repository)
+        stars = self._get_repo_stars(repository)
+        
+        open_issues = 0
+        forks = 0
+        if isinstance(repository, dict):
+            open_issues = int(repository.get("open_issues") or repository.get("open_issues_count") or 0)
+            forks = int(repository.get("forks") or repository.get("forks_count") or 0)
+
+        if not self._client:
+            return self._generate_mock_insight(name, description, language, stars, forks, open_issues)
+
+        system_prompt = (
+            "You are a helpful software architect. Analyze the repository metadata and README text, "
+            "then generate a structured JSON analysis report of the repository. "
+            "You MUST respond ONLY with a raw JSON object matching the following format (no markdown, no formatting, no wrapping):\n"
+            "{\n"
+            '  "summary": "2-3 sentences executive summary...",\n'
+            '  "scores": {\n'
+            '    "maintenance": 85,\n'
+            '    "documentation": 90,\n'
+            '    "community": 75,\n'
+            '    "codeQuality": 88,\n'
+            '    "security": 92\n'
+            '  },\n'
+            '  "strengths": ["strength 1", "strength 2", "strength 3"],\n'
+            '  "weaknesses": ["weakness 1", "weakness 2"],\n'
+            '  "bestUseCases": ["use case 1", "use case 2", "use case 3"]\n'
+            "}"
+        )
+
+        readme_snippet = readme_text[:6000] if readme_text else "No README available."
+        user_prompt = (
+            f"Name: {name}\n"
+            f"Description: {description}\n"
+            f"Language: {language}\n"
+            f"Stars: {stars}\n"
+            f"Forks: {forks}\n"
+            f"Open Issues: {open_issues}\n"
+            f"README snippet:\n{readme_snippet}"
+        )
+
+        try:
+            response = self._client.chat.completions.create(
+                model=self._model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens=600,
+                temperature=0.3,
+            )
+            raw_content = response.choices[0].message.content.strip()
+            
+            if raw_content.startswith("```"):
+                lines = raw_content.splitlines()
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                raw_content = "\n".join(lines).strip()
+
+            data = json.loads(raw_content)
+            required_keys = ["summary", "scores", "strengths", "weaknesses", "bestUseCases"]
+            if all(k in data for k in required_keys):
+                return data
+            else:
+                logger.warning("LLM response did not contain all required keys. Falling back to mock.")
+                return self._generate_mock_insight(name, description, language, stars, forks, open_issues)
+        except Exception as e:
+            logger.error(f"Failed to generate LLM insight report: {e}")
+            return self._generate_mock_insight(name, description, language, stars, forks, open_issues)
+

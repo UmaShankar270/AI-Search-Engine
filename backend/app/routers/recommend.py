@@ -1,39 +1,59 @@
-import requests
-from fastapi import APIRouter
+import logging
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.services.discovery_service import DiscoveryService
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.get("/recommend")
-def recommend(query: str):
+def recommend(request: Request, query: str = None, q: str = None):
+    effective_query = query or q
+    if not effective_query:
+        effective_query = "awesome open source"
 
-    url = f"https://api.github.com/search/repositories?q={query}"
+    discovery = DiscoveryService()
+    # Concurrently search all platforms for candidate repositories
+    candidates = discovery.search_all_platforms(
+        query=effective_query,
+        page=1,
+        per_page=15
+    )
 
-    response = requests.get(url)
+    if not candidates:
+        return []
 
-    if response.status_code != 200:
-        return {"error": "Failed to fetch repositories"}
+    facade = getattr(request.app.state, "ai_facade", None)
+    if not facade:
+        # Fallback sorting by stars
+        candidates.sort(key=lambda x: x.get("stars", 0), reverse=True)
+        return candidates[:5]
 
-    data = response.json()
-
-    repos = []
-
-    for repo in data["items"][:20]:
-
-        stars = repo["stargazers_count"]
-        forks = repo["forks_count"]
-
-        score = round((stars * 0.7) + (forks * 0.3), 2)
-
-        repos.append({
-            "name": repo["name"],
-            "full_name": repo["full_name"],
-            "stars": stars,
-            "forks": forks,
-            "language": repo["language"],
-            "score": score,
-            "url": repo["html_url"]
-        })
-
-    repos.sort(key=lambda x: x["score"], reverse=True)
-
-    return repos[:5]
+    try:
+        # Build embedding map for candidates
+        embedding_map = facade._build_embedding_map(candidates)
+        # Get recommended set
+        rec_set = facade.recommend_from_query(
+            query=effective_query,
+            all_repositories=candidates,
+            embedding_map=embedding_map,
+            top_n=5
+        )
+        
+        recommended_list = []
+        for rec in rec_set.recommendations:
+            orig_repo = next(
+                (c for c in candidates if c.get("full_name") == rec.repo_id),
+                None
+            )
+            if orig_repo:
+                recommended_list.append({
+                    **orig_repo,
+                    "score": round(float(rec.score), 2),
+                    "reason": rec.reason
+                })
+        return recommended_list
+    except Exception as e:
+        logger.warning("AI recommendation failed: %s", str(e))
+        # Fallback sorting
+        candidates.sort(key=lambda x: x.get("stars", 0), reverse=True)
+        return candidates[:5]

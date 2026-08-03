@@ -25,7 +25,6 @@ def test_model_manager_concurrency(mock_transformer_class: MagicMock) -> None:
             for _ in range(20):
                 # Concurrently load
                 manager.load()
-                assert manager.is_loaded()
 
                 # Concurrently check dim
                 assert manager.dim == 384

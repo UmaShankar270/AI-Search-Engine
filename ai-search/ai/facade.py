@@ -356,6 +356,9 @@ class AIFacade:
     def summarize(self, repository: Any) -> str:
         return self._summarizer.generate(repository)
 
+    def generate_insight_report(self, repository: Any, readme_text: str = "") -> dict[str, Any]:
+        return self._summarizer.generate_insight_report(repository, readme_text)
+
     def compare(self, repositories: list[Any]) -> ComparisonResult:
         return self._summarizer.compare(repositories)
 
