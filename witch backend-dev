@@ -1,0 +1,41 @@
+* [33ma78f76b[m[33m ([m[1;32mbackend-dev[m[33m)[m temp: save cache files to allow branch switch
+* [33m84ce2f7[m bug fixes
+* [33m9a3e571[m Bug fix
+[31m|[m * [33m4dcc29f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Bug fix
+[31m|[m * [33m55cad1d[m error fix
+[31m|[m * [33m9b661b5[m Initial commit
+[31m|[m * [33m099a7cf[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on backend-dev: 50036dd Complete backend and frontend integration
+[31m|[m[31m/[m[34m|[m 
+[31m|[m * [33mc19464a[m index on backend-dev: 50036dd Complete backend and frontend integration
+[31m|[m[31m/[m  
+* [33m50036dd[m[33m ([m[1;31morigin/backend-dev[m[33m, [m[1;31morigin/HEAD[m[33m)[m Complete backend and frontend integration
+* [33madb8156[m Added analytics, favorites, history, trending repositories, pagination, caching and database models
+* [33m40ac878[m Describe your AI module changes
+*   [33m839004f[m Merge pull request #3 from UmaShankar270/ai-search
+[35m|[m[36m\[m  
+[35m|[m * [33m9223ce7[m[33m ([m[1;31morigin/ai-search[m[33m)[m Complete AI module and backend integration
+[35m|[m * [33medaddb3[m baxkend integration prephase
+[35m|[m * [33ma4fab91[m Generate AI module FastAPI integration guide docs
+[35m|[m * [33m48bb61c[m Generate AI module developer guide docs
+[35m|[m * [33mf8ec7ca[m Generate AI module architectural and integration docs
+[35m|[m * [33mc82202a[m[33m ([m[1;33mtag: [m[1;33mai-module-v1.0[m[33m)[m Complete AI module implementation and validation
+[35m|[m * [33m9e84b76[m Fix stale Cache export in ai.utils
+[35m|[m *   [33m69ef6c9[m Merge remote-tracking branch 'origin/backend-dev' into ai-search
+[35m|[m [1;31m|[m[35m\[m  
+[35m|[m [1;31m|[m[35m/[m  
+[35m|[m[35m/[m[1;31m|[m   
+* [1;31m|[m   [33m8b95edc[m Merge pull request #2 from UmaShankar270/ai-search
+[1;33m|[m[1;34m\[m [1;31m\[m  
+* [1;34m|[m [1;31m|[m [33m3f1ca7d[m Ignore environment and cache files
+* [1;34m|[m [1;31m|[m [33m9dc8985[m Add AI README analyzer and recommendation endpoints
+* [1;34m|[m [1;31m|[m [33m3fcb65c[m Update frontend
+* [1;34m|[m [1;31m|[m [33m4c22556[m Complete frontend implementation
+* [1;34m|[m [1;31m|[m   [33mea64ea6[m Merge branch 'backend-dev' of https://github.com/UmaShankar270/AI-Search-Engine into backend-dev
+[1;35m|[m[1;36m\[m [1;34m\[m [1;31m\[m  
+* [1;36m|[m [1;34m|[m [1;31m|[m [33mc4f4e2b[m Complete frontend implementation
+[1;36m|[m [1;36m|[m [1;34m|[m * [33m65e99db[m fixing errors
+[1;36m|[m [1;36m|[m [1;34m|[m[1;34m/[m  
+[1;36m|[m [1;36m|[m * [33m216c53d[m added
+[1;36m|[m [1;36m|[m[1;36m/[m  
+[1;36m|[m * [33m9aa6e4b[m Merge pull request #1 from UmaShankar270/ai-search
+[1;36m|[m[1;36m/[m[32m|[m 

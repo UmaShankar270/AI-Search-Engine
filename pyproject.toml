@@ -1,0 +1,47 @@
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "ai-search,backend"
+python_executable = ".venv/Scripts/python.exe"
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "scripts.*", "ai-search.tests.*", "ai-search.scripts.*"]
+disable_error_code = [
+    "untyped-decorator",
+    "no-untyped-def",
+    "no-any-return",
+    "misc",
+]
+
+[[tool.mypy.overrides]]
+module = "app.*"
+strict = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "sentence_transformers.*",
+    "torch.*",
+    "faiss.*",
+    "google.generativeai.*",
+    "google.*",
+    "requests.*",
+    "cachetools.*",
+    "tenacity.*",
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]

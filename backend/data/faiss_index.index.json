@@ -1,0 +1,531 @@
+{
+  "repo_to_vector": {
+    "RasaHQ/rasa": 1601729967717727019,
+    "facebookresearch/llama-recipes": 2664098469072036382,
+    "yogeshpandey586/chatbot-intent-classifier": 8724727028591336623,
+    "satvikag/chatbot": 6954412665432187786,
+    "npc-engine/exported-bart-light-gail-chatbot": 2559946969035599005,
+    "scikit-learn/scikit-learn": 5609166400493125340,
+    "pytorch/pytorch": 168550619328293968
+  },
+  "vector_to_repo": {
+    "1601729967717727019": "RasaHQ/rasa",
+    "2664098469072036382": "facebookresearch/llama-recipes",
+    "8724727028591336623": "yogeshpandey586/chatbot-intent-classifier",
+    "6954412665432187786": "satvikag/chatbot",
+    "2559946969035599005": "npc-engine/exported-bart-light-gail-chatbot",
+    "5609166400493125340": "scikit-learn/scikit-learn",
+    "168550619328293968": "pytorch/pytorch"
+  },
+  "metadata": {
+    "RasaHQ/rasa": {
+      "name": "rasa",
+      "full_name": "RasaHQ/rasa",
+      "owner": "RasaHQ",
+      "description": "Papers with Code repository. Framework: PyTorch. Open source machine learning framework to automate text- and voice-based conversations. Framework: PyTorch.",
+      "stars": 16500,
+      "forks": 4200,
+      "watchers": 16500,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/RasaHQ/rasa",
+      "platform": "Papers with Code",
+      "topics": [
+        "PyTorch"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.061401285231113434,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 50.4,
+      "aiScore": 50.4,
+      "healthScore": 78.7,
+      "popularityScore": 87.0,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Trusted organization"
+      ],
+      "rank": 3
+    },
+    "facebookresearch/llama-recipes": {
+      "name": "llama-recipes",
+      "full_name": "facebookresearch/llama-recipes",
+      "owner": "facebookresearch",
+      "description": "Papers with Code repository. Framework: PyTorch. Llama 2 & 3 chatbot and fine-tuning recipes. Framework: PyTorch.",
+      "stars": 8200,
+      "forks": 1200,
+      "watchers": 8200,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/facebookresearch/llama-recipes",
+      "platform": "Papers with Code",
+      "topics": [
+        "PyTorch"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.1042875200510025,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 48.1,
+      "aiScore": 48.1,
+      "healthScore": 76.5,
+      "popularityScore": 74.5,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption"
+      ],
+      "rank": 4
+    },
+    "yogeshpandey586/chatbot-intent-classifier": {
+      "name": "chatbot-intent-classifier",
+      "full_name": "yogeshpandey586/chatbot-intent-classifier",
+      "owner": "yogeshpandey586",
+      "description": "Hugging Face Model Hub repository. Likes: 1. Downloads: 132. Tags: transformers, safetensors, modernbert, text-classification, intent-classification, chatbot.",
+      "stars": 1,
+      "forks": 6,
+      "watchers": 1,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://huggingface.co/yogeshpandey586/chatbot-intent-classifier",
+      "platform": "Hugging Face",
+      "topics": [
+        "transformers",
+        "safetensors",
+        "modernbert",
+        "text-classification",
+        "intent-classification",
+        "chatbot",
+        "enterprise-chatbot",
+        "nlp",
+        "en",
+        "base_model:answerdotai/ModernBERT-base",
+        "base_model:finetune:answerdotai/ModernBERT-base",
+        "license:apache-2.0"
+      ],
+      "last_updated": "2026-07-31T19:06:04.000Z",
+      "license": "APACHE-2.0",
+      "semantic_score": 0.003967630211263895,
+      "matchScore": 46.1,
+      "aiScore": 46.1,
+      "healthScore": 54.2,
+      "popularityScore": 12.8,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality"
+      ],
+      "rank": 4
+    },
+    "satvikag/chatbot": {
+      "name": "chatbot",
+      "full_name": "satvikag/chatbot",
+      "owner": "satvikag",
+      "description": "Hugging Face Model Hub repository. Likes: 37. Downloads: 94. Tags: transformers, pytorch, gpt2, text-generation, conversational, license:mit.",
+      "stars": 37,
+      "forks": 4,
+      "watchers": 37,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://huggingface.co/satvikag/chatbot",
+      "platform": "Hugging Face",
+      "topics": [
+        "transformers",
+        "pytorch",
+        "gpt2",
+        "text-generation",
+        "conversational",
+        "license:mit",
+        "text-generation-inference",
+        "endpoints_compatible",
+        "region:us",
+        "deploy:azure"
+      ],
+      "last_updated": "2021-06-04T20:08:11.000Z",
+      "license": "MIT",
+      "semantic_score": 0.07657666504383087,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 35.9,
+      "aiScore": 35.9,
+      "healthScore": 54.2,
+      "popularityScore": 18.5,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Stable release maturity"
+      ],
+      "rank": 5
+    },
+    "npc-engine/exported-bart-light-gail-chatbot": {
+      "name": "exported-bart-light-gail-chatbot",
+      "full_name": "npc-engine/exported-bart-light-gail-chatbot",
+      "owner": "npc-engine",
+      "description": "Hugging Face Model Hub repository. Likes: 2. Downloads: 0. Tags: onnx, conversational, npc-engine, en, arxiv:2004.13796, license:mit.",
+      "stars": 2,
+      "forks": 0,
+      "watchers": 2,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://huggingface.co/npc-engine/exported-bart-light-gail-chatbot",
+      "platform": "Hugging Face",
+      "topics": [
+        "onnx",
+        "conversational",
+        "npc-engine",
+        "en",
+        "arxiv:2004.13796",
+        "license:mit",
+        "region:us"
+      ],
+      "last_updated": "2022-05-24T14:10:35.000Z",
+      "license": "MIT",
+      "semantic_score": 0.1244141012430191,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "exported-bart-light-gail-chatbot",
+            "url": "https://huggingface.co/npc-engine/exported-bart-light-gail-chatbot",
+            "stars": 2,
+            "forks": 0,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 37.6,
+      "aiScore": 37.6,
+      "healthScore": 54.2,
+      "popularityScore": 9.1,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Stable release maturity"
+      ],
+      "rank": 5
+    },
+    "scikit-learn/scikit-learn": {
+      "name": "scikit-learn",
+      "full_name": "scikit-learn/scikit-learn",
+      "owner": "scikit-learn",
+      "description": "Papers with Code repository. Framework: NumPy. Machine learning in Python. Simple and efficient tools for predictive data analysis. Framework: NumPy.",
+      "stars": 57000,
+      "forks": 24000,
+      "watchers": 57000,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/scikit-learn/scikit-learn",
+      "platform": "Papers with Code",
+      "topics": [
+        "NumPy"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.11833290755748749,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 53.3,
+      "aiScore": 53.3,
+      "healthScore": 81.1,
+      "popularityScore": 96.8,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Active contributors",
+        "Trusted organization"
+      ],
+      "rank": 1
+    },
+    "pytorch/pytorch": {
+      "name": "pytorch",
+      "full_name": "pytorch/pytorch",
+      "owner": "pytorch",
+      "description": "Papers with Code repository. Framework: PyTorch. Tensors and Dynamic neural networks in Python with strong GPU acceleration. Framework: PyTorch.",
+      "stars": 78000,
+      "forks": 21000,
+      "watchers": 78000,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/pytorch/pytorch",
+      "platform": "Papers with Code",
+      "topics": [
+        "PyTorch"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.07013183832168579,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 52.6,
+      "aiScore": 52.6,
+      "healthScore": 81.7,
+      "popularityScore": 96.5,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Active contributors",
+        "Trusted organization"
+      ],
+      "rank": 2
+    }
+  }
+}
