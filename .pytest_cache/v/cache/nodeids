@@ -1,1 +1,22 @@
-[]
+[
+  "backend/tests/test_backend.py::test_all_providers_normalize",
+  "backend/tests/test_backend.py::test_analytics_enriched",
+  "backend/tests/test_backend.py::test_compare_accepts_post_payload",
+  "backend/tests/test_backend.py::test_compute_lexical_score",
+  "backend/tests/test_backend.py::test_cors_headers_are_present_for_browser_requests",
+  "backend/tests/test_backend.py::test_delete_history_and_favorite",
+  "backend/tests/test_backend.py::test_docs_and_openapi",
+  "backend/tests/test_backend.py::test_duplicate_detector_token_similarity",
+  "backend/tests/test_backend.py::test_exact_match_booster_semantic",
+  "backend/tests/test_backend.py::test_expand_query",
+  "backend/tests/test_backend.py::test_favorites_and_history_round_trip",
+  "backend/tests/test_backend.py::test_new_ranking_factors",
+  "backend/tests/test_backend.py::test_recommend_returns_scores",
+  "backend/tests/test_backend.py::test_recommendation_reasons_enriched",
+  "backend/tests/test_backend.py::test_repo_details_returns_404",
+  "backend/tests/test_backend.py::test_root_health",
+  "backend/tests/test_backend.py::test_search_accepts_q_alias",
+  "backend/tests/test_backend.py::test_search_requires_query",
+  "backend/tests/test_backend.py::test_summarizer_fallback_enriched",
+  "backend/tests/test_backend.py::test_trending_works"
+]

@@ -325,6 +325,39 @@ class TechnologyMatch(BaseFactor):
         })
 
 
+class RepositoryTrust(BaseFactor):
+    name = "repository_trust"
+    label = "Repository Trust"
+
+    def compute(
+        self, repo: CandidateRepo, query: str = "", intent: Optional[str] = None
+    ) -> FactorScore:
+        star_score = min(1.0, repo.stars / 5000.0) if repo.stars > 0 else 0.0
+        contrib_score = min(1.0, repo.contributors / 50.0) if repo.contributors > 0 else 0.0
+        score = 0.5 * star_score + 0.5 * contrib_score
+        return self._make_score(score, {"stars": repo.stars, "contributors": repo.contributors})
+
+
+class ProjectMaturity(BaseFactor):
+    name = "project_maturity"
+    label = "Project Maturity"
+
+    def compute(
+        self, repo: CandidateRepo, query: str = "", intent: Optional[str] = None
+    ) -> FactorScore:
+        days = 0
+        if repo.created_at:
+            try:
+                created = datetime.fromisoformat(repo.created_at.replace("Z", "+00:00"))
+                days = (datetime.now().astimezone() - created).days
+            except (ValueError, TypeError):
+                days = 0
+        age_score = min(1.0, days / 365.0)
+        release_score = min(1.0, repo.releases_last_year / 5.0)
+        score = 0.5 * age_score + 0.5 * release_score
+        return self._make_score(score, {"age_days": days, "releases_last_year": repo.releases_last_year})
+
+
 FACTOR_CLASSES: list[type[BaseFactor]] = [
     SemanticSimilarity,
     GitHubStars,
@@ -344,4 +377,7 @@ FACTOR_CLASSES: list[type[BaseFactor]] = [
     PopularityTrend,
     TechnologyMatch,
     UserIntentMatch,
+    RepositoryTrust,
+    ProjectMaturity,
 ]
+

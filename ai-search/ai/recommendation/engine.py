@@ -45,7 +45,7 @@ class RecommendationEngine:
 
         scored: list[tuple[float, float, dict[str, Any]]] = []
         for repo in all_repos:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             if rid in excluded:
                 continue
             target_embedding = embedding_map.get(rid)
@@ -77,7 +77,7 @@ class RecommendationEngine:
 
         recommendations = []
         for score, sim, repo in top:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             matched = matched_topics.get(rid, [])
             lang = repo.get("language", "")
             reasons = self._build_reasons(score, matched, lang, source_language)
@@ -115,7 +115,7 @@ class RecommendationEngine:
 
         scored: list[tuple[float, dict[str, Any]]] = []
         for repo in all_repos:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             if rid in excluded:
                 continue
             target_embedding = embedding_map.get(rid)
@@ -129,17 +129,29 @@ class RecommendationEngine:
 
         recommendations = []
         for score, repo in top:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             lang = repo.get("language", "")
+            stars = repo.get("stars", 0) or 0
+            
+            reasons = [f"Semantic similarity {score:.3f} to query"]
+            if stars >= 10000:
+                reasons.append("Popular repository")
+            elif stars > 0:
+                reasons.append(f"Has {stars} stars")
+            if lang:
+                reasons.append(f"Language: {lang}")
+            
+            reason_str = "; ".join(reasons)
+            
             recommendations.append(
                 Recommendation(
                     repo_id=rid,
                     score=score,
-                    reason=f"Semantic similarity {score:.3f} to query",
+                    reason=reason_str,
                     similarity_score=score,
                     language=lang,
                     matched_topics=repo.get("topics") or [],
-                    metadata={"stars": repo.get("stars", 0)},
+                    metadata={"stars": stars},
                 )
             )
 
@@ -179,7 +191,7 @@ class RecommendationEngine:
 
         scored: list[tuple[float, dict[str, Any], float, float, float, float, list[str]]] = []
         for repo in all_repos:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             if rid in excluded:
                 continue
             target_embedding = embedding_map.get(rid)
@@ -221,7 +233,7 @@ class RecommendationEngine:
 
         recommendations = []
         for total, repo, cs, ps, pfs, ts, matched in top:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             lang = repo.get("language", "")
             reasons = self._build_hybrid_reasons(cs, ps, pfs, ts)
             recommendations.append(
@@ -270,7 +282,7 @@ class RecommendationEngine:
 
         recommendations = []
         for repo in top:
-            rid = repo.get("repo_id", "")
+            rid = self._get_repo_id(repo)
             lang = repo.get("language", "")
             val = repo.get(sort_key, 0) or 0
             score = val / max_val
@@ -296,15 +308,18 @@ class RecommendationEngine:
             strategy="popular",
         )
 
+    def _get_repo_id(self, repo: dict[str, Any]) -> str:
+        return repo.get("full_name") or repo.get("repo_id") or repo.get("id") or ""
+
     def _get_topics(self, all_repos: list[dict[str, Any]], repo_id: str) -> list[str]:
         for repo in all_repos:
-            if repo.get("repo_id") == repo_id:
+            if self._get_repo_id(repo) == repo_id:
                 return repo.get("topics") or []
         return []
 
     def _get_language(self, all_repos: list[dict[str, Any]], repo_id: str) -> str:
         for repo in all_repos:
-            if repo.get("repo_id") == repo_id:
+            if self._get_repo_id(repo) == repo_id:
                 return repo.get("language") or ""
         return ""
 

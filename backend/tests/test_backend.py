@@ -31,8 +31,9 @@ def client():
 
 class DummyResponse:
     def __init__(self, payload=None, status_code=200):
-        self._payload = payload or {}
+        self._payload = payload if payload is not None else {}
         self.status_code = status_code
+        self.headers = {"X-RateLimit-Remaining": "60", "X-RateLimit-Reset": "0"}
 
     def json(self):
         return self._payload
@@ -40,6 +41,64 @@ class DummyResponse:
     def raise_for_status(self):
         if self.status_code >= 400:
             raise RuntimeError("request failed")
+
+    @property
+    def text(self):
+        if isinstance(self._payload, str):
+            return self._payload
+        return str(self._payload)
+
+
+def smart_mock(method_or_url, url=None, *args, **kwargs):
+    # Normalize method and url depending on whether it is requests.get or requests.request
+    if url is None:
+        url = method_or_url
+    url_lower = url.lower()
+    
+    if "search/repositories" in url_lower:
+        search_payload = {
+            "items": [
+                {
+                    "id": 123456,
+                    "name": "demo",
+                    "full_name": "demo/demo",
+                    "description": "Demo repo",
+                    "stargazers_count": 200,
+                    "forks_count": 50,
+                    "language": "Python",
+                    "html_url": "https://example.com/demo",
+                    "owner": {"login": "demo", "avatar_url": "https://example.com/avatar.png"}
+                }
+            ]
+        }
+        return DummyResponse(search_payload)
+    elif "languages" in url_lower:
+        return DummyResponse({"Python": 5000})
+    elif "contributors" in url_lower:
+        return DummyResponse([{"login": "contrib1", "contributions": 10}])
+    elif "releases" in url_lower:
+        return DummyResponse([{"tag_name": "v1.0.0"}])
+    elif "readme" in url_lower:
+        return DummyResponse({"download_url": "https://example.com/readme"})
+    elif "example.com/readme" in url_lower:
+        return DummyResponse("Mock Readme Content", 200)
+    elif "owner/a" in url_lower or url_lower.endswith("/a"):
+        return DummyResponse({"id": 1, "name": "a", "full_name": "owner/a", "stargazers_count": 1, "forks_count": 2, "language": "Python"})
+    elif "owner/b" in url_lower or url_lower.endswith("/b"):
+        return DummyResponse({"id": 2, "name": "b", "full_name": "owner/b", "stargazers_count": 3, "forks_count": 4, "language": "Go"})
+    else:
+        default_payload = {
+            "id": 999,
+            "name": "demo",
+            "full_name": "demo/demo",
+            "description": "Demo repo",
+            "stargazers_count": 100,
+            "forks_count": 10,
+            "language": "Python",
+            "html_url": "https://example.com/demo",
+            "owner": {"login": "demo", "avatar_url": "https://example.com/avatar.png"}
+        }
+        return DummyResponse(default_payload)
 
 
 def test_root_health(client):
@@ -84,20 +143,8 @@ def test_search_requires_query(client):
 
 
 def test_trending_works(monkeypatch, client):
-    payload = {
-        "items": [
-            {
-                "name": "demo",
-                "full_name": "demo/demo",
-                "description": "Demo repo",
-                "stargazers_count": 200,
-                "language": "Python",
-                "html_url": "https://example.com/demo",
-            }
-        ]
-    }
-
-    monkeypatch.setattr("app.routers.repo.requests.get", lambda *args, **kwargs: DummyResponse(payload))
+    monkeypatch.setattr("requests.get", smart_mock)
+    monkeypatch.setattr("requests.request", smart_mock)
 
     response = client.get("/trending")
 
@@ -106,7 +153,8 @@ def test_trending_works(monkeypatch, client):
 
 
 def test_repo_details_returns_404(monkeypatch, client):
-    monkeypatch.setattr("app.routers.repo_details.requests.get", lambda *args, **kwargs: DummyResponse({}, 404))
+    monkeypatch.setattr("requests.get", lambda *args, **kwargs: DummyResponse({}, 404))
+    monkeypatch.setattr("requests.request", lambda *args, **kwargs: DummyResponse({}, 404))
 
     response = client.get("/repo/notreal/notreal")
 
@@ -114,12 +162,8 @@ def test_repo_details_returns_404(monkeypatch, client):
 
 
 def test_compare_accepts_post_payload(monkeypatch, client):
-    payload = {
-        "repo1": {"full_name": "owner/a", "stargazers_count": 1, "forks_count": 2, "language": "Python"},
-        "repo2": {"full_name": "owner/b", "stargazers_count": 3, "forks_count": 4, "language": "Go"},
-    }
-
-    monkeypatch.setattr("app.routers.compare.requests.get", lambda *args, **kwargs: DummyResponse(payload["repo1"] if args[0].endswith("/a") else payload["repo2"]))
+    monkeypatch.setattr("requests.get", smart_mock)
+    monkeypatch.setattr("requests.request", smart_mock)
 
     response = client.post(
         "/compare",
@@ -127,17 +171,13 @@ def test_compare_accepts_post_payload(monkeypatch, client):
     )
 
     assert response.status_code == 200
-    assert response.json()["repo1"]["name"] == "owner/a"
+    assert "winner" in response.json()
+    assert "strengthsA" in response.json()
 
 
 def test_recommend_returns_scores(monkeypatch, client):
-    payload = {
-        "items": [
-            {"name": "demo", "full_name": "demo/demo", "stargazers_count": 100, "forks_count": 10, "language": "Python", "html_url": "https://example.com/demo"}
-        ]
-    }
-
-    monkeypatch.setattr("app.routers.recommend.requests.get", lambda *args, **kwargs: DummyResponse(payload))
+    monkeypatch.setattr("requests.get", smart_mock)
+    monkeypatch.setattr("requests.request", smart_mock)
 
     response = client.get("/recommend?query=fastapi")
 

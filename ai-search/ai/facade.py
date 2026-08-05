@@ -335,7 +335,7 @@ class AIFacade:
     ) -> dict[str, np.ndarray]:
         result: dict[str, np.ndarray] = {}
         for repo in repositories:
-            repo_id = repo.get("repo_id", "")
+            repo_id = repo.get("full_name") or repo.get("repo_id") or repo.get("id") or ""
             if not repo_id:
                 continue
             try:

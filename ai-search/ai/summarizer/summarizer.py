@@ -94,9 +94,18 @@ class SummaryGenerator:
             # Fallback to local rule-based mock summary
             desc_part = f": {description}" if description else " (no description available)"
             lang_part = f" written in {language}" if language else ""
+            
+            classification = ""
+            if description:
+                desc_lower = description.lower()
+                if "react" in desc_lower or "web" in desc_lower or "api" in desc_lower or "server" in desc_lower:
+                    classification = " It serves as a web application or user interface components."
+                elif "machine learning" in desc_lower or "neural" in desc_lower or "model" in desc_lower:
+                    classification = " It focuses on machine learning and predictive model capabilities."
+            
             return (
                 f"{name} is an open-source repository{lang_part} "
-                f"with {stars} stars{desc_part}. "
+                f"with {stars} stars{desc_part}.{classification} "
                 "It is optimized for modularity and scalability."
             )
 

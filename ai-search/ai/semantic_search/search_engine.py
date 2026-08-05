@@ -365,7 +365,21 @@ class SemanticSearchEngine:
                         boost = True
                         break
             if boost:
-                hit.score = min(1.0, hit.score * self._boost_factor)
+                is_exact = False
+                if hit.repo_id:
+                    repo_name = hit.repo_id.split("/")[-1].lower()
+                    if query_lower == repo_name:
+                        is_exact = True
+                if hit.metadata:
+                    name = hit.metadata.get("name", "")
+                    if query_lower == name.lower():
+                        is_exact = True
+                
+                multiplier = self._boost_factor
+                if is_exact:
+                    multiplier *= 2.0
+                
+                hit.score = min(1.0, hit.score * multiplier)
 
         hits.sort(key=lambda h: h.score, reverse=True)
         for i, hit in enumerate(hits):
