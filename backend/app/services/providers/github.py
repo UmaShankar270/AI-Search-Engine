@@ -87,23 +87,59 @@ class GitHubProvider(RepositoryProvider):
             logger.error(f"Network error in GitHub API request to {url}: {e}")
             raise HTTPException(status_code=502, detail=f"GitHub API Connection Error: {str(e)}")
 
-    def search(self, query: str, language: Optional[str] = None, page: int = 1, per_page: int = 10) -> list[dict[str, Any]]:
+    def search(self, query: str, language: Optional[str] = None, page: int = 1, per_page: int = 10, sort: Optional[str] = None) -> list[dict[str, Any]]:
+        # Optimize query: search across metadata
+        if "in:" not in query.lower():
+            query_optimized = f"{query} in:name,description,topics"
+        else:
+            query_optimized = query
+
         if language and language != "All":
-            query = f"{query} language:{language}"
+            query_optimized = f"{query_optimized} language:{language}"
+
         url = "https://api.github.com/search/repositories"
-        try:
-            response = self._request("GET", url, params={"q": query, "page": page, "per_page": per_page})
-            if response.status_code != 200:
-                logger.error(f"GitHub search failed: status code {response.status_code}")
+        repos = []
+        seen_ids = set()
+
+        # Map frontend sortBy options to GitHub Search API sort field names
+        github_sort = None
+        if sort == "stars":
+            github_sort = "stars"
+        elif sort == "forks":
+            github_sort = "forks"
+        elif sort == "updated":
+            github_sort = "updated"
+
+        def fetch_page(p: int):
+            try:
+                params = {"q": query_optimized, "page": p, "per_page": 100}
+                if github_sort:
+                    params["sort"] = github_sort
+                response = self._request("GET", url, params=params)
+                if response.status_code == 200:
+                    return response.json().get("items", [])
+                else:
+                    logger.error(f"GitHub search page {p} failed: status code {response.status_code}")
+                    return []
+            except Exception as e:
+                logger.error(f"Error fetching GitHub search page {p}: {e}")
                 return []
-            data = response.json()
-            repos = []
-            for item in data.get("items", []):
-                repos.append(self._normalize(item))
-            return repos
-        except Exception as exc:
-            logger.error(f"Error during GitHub search: {exc}")
-            return []
+
+        # Fetch up to 5 pages concurrently to get a comprehensive set of results (up to 500 repositories)
+        max_pages = 5
+        with ThreadPoolExecutor(max_workers=max_pages) as executor:
+            futures = [executor.submit(fetch_page, p) for p in range(1, max_pages + 1)]
+            for fut in as_completed(futures):
+                items = fut.result()
+                for item in items:
+                    repo_id = str(item.get("id"))
+                    if repo_id not in seen_ids:
+                        seen_ids.add(repo_id)
+                        repos.append(self._normalize(item))
+
+        logger.info(f"GitHub Search retrieved and merged {len(repos)} repositories across {max_pages} pages.")
+        return repos
+
 
     def getRepository(self, owner: str, repo: str) -> Optional[dict[str, Any]]:
         base_url = f"https://api.github.com/repos/{owner}/{repo}"

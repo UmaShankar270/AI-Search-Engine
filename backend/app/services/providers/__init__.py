@@ -5,6 +5,8 @@ from app.services.providers.codeberg import CodebergProvider
 from app.services.providers.bitbucket import BitbucketProvider
 from app.services.providers.sourceforge import SourceForgeProvider
 from app.services.providers.scraper import WebScraperProvider
+from app.services.providers.huggingface import HuggingFaceProvider
+from app.services.providers.paperswithcode import PapersWithCodeProvider
 
 __all__ = [
     "RepositoryProvider",
@@ -13,5 +15,7 @@ __all__ = [
     "CodebergProvider",
     "BitbucketProvider",
     "SourceForgeProvider",
-    "WebScraperProvider"
+    "WebScraperProvider",
+    "HuggingFaceProvider",
+    "PapersWithCodeProvider"
 ]

@@ -33,12 +33,18 @@ export default function Search() {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
   const resultsPerPage = 4;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [queryParam]);
 
   useEffect(() => {
     if (!queryParam) {
       setRepositories([]);
       setHasSearched(false);
+      setTotalResults(0);
       return;
     }
 
@@ -46,7 +52,6 @@ export default function Search() {
     setHasSearched(true);
     setLoading(true);
     setError(null);
-    setCurrentPage(1);
 
     let active = true;
 
@@ -55,9 +60,14 @@ export default function Search() {
         if (queryParam.toLowerCase() === 'error') {
           throw new Error('Simulation API error');
         }
-        const data = await searchRepositories(queryParam, filters);
+        const data = await searchRepositories(queryParam, {
+          ...filters,
+          page: currentPage,
+          per_page: resultsPerPage
+        });
         if (active) {
-          setRepositories(data);
+          setRepositories(data.results);
+          setTotalResults(data.totalCount);
         }
       } catch (err) {
         if (active) {
@@ -75,77 +85,23 @@ export default function Search() {
     return () => {
       active = false;
     };
-  }, [queryParam]);
+  }, [queryParam, currentPage, filters]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
+    setCurrentPage(1);
     setSearchParams({ q: query });
   };
 
   const handleRetry = () => {
+    setCurrentPage(1);
     setSearchParams({ q: queryParam });
   };
 
-  const getProcessedRepositories = () => {
-    let result = [...repositories];
-
-    if (filters.language !== 'All') {
-      result = result.filter(
-        (repo) => repo.language?.toLowerCase() === filters.language.toLowerCase()
-      );
-    }
-
-    if (filters.stars !== 'All') {
-      const minStars = parseInt(filters.stars, 10);
-      result = result.filter((repo) => repo.stars >= minStars);
-    }
-
-    if (filters.forks !== 'All') {
-      const minForks = parseInt(filters.forks, 10);
-      result = result.filter((repo) => repo.forks >= minForks);
-    }
-
-    if (filters.license !== 'All') {
-      result = result.filter(
-        (repo) => repo.license?.toLowerCase() === filters.license.toLowerCase()
-      );
-    }
-
-    if (filters.updated !== 'All') {
-      const daysLimit = parseInt(filters.updated, 10);
-      const limitDate = new Date('2026-07-30');
-      limitDate.setDate(limitDate.getDate() - daysLimit);
-
-      result = result.filter((repo) => {
-        if (!repo.lastUpdated) return false;
-        const updatedDate = new Date(repo.lastUpdated);
-        return updatedDate >= limitDate;
-      });
-    }
-
-    if (filters.sortBy === 'match') {
-      result.sort((a, b) => b.matchScore - a.matchScore);
-    } else if (filters.sortBy === 'stars') {
-      result.sort((a, b) => b.stars - a.stars);
-    } else if (filters.sortBy === 'forks') {
-      result.sort((a, b) => b.forks - a.forks);
-    } else if (filters.sortBy === 'updated') {
-      result.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
-    } else if (filters.sortBy === 'name') {
-      result.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return result;
-  };
-
-  const processedRepos = getProcessedRepositories();
-
-  const totalPages = Math.ceil(processedRepos.length / resultsPerPage);
-  const paginatedRepos = processedRepos.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
-  );
+  const processedRepos = repositories;
+  const paginatedRepos = repositories;
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -158,7 +114,7 @@ export default function Search() {
         query={query}
         setQuery={setQuery}
         onSearch={handleSearch}
-        totalResults={processedRepos.length}
+        totalResults={totalResults}
         executionTime={0.12}
         hasSearched={hasSearched}
       />
@@ -186,7 +142,7 @@ export default function Search() {
           <div className="flex-1 w-full space-y-6">
             <div className="flex lg:hidden justify-between items-center bg-white dark:bg-brand-gray-900 border border-brand-gray-200 dark:border-brand-gray-800 rounded-xl p-3 shadow-sm">
               <span className="text-xs font-semibold text-brand-gray-500">
-                Found {processedRepos.length} matches
+                Found {totalResults} matches
               </span>
               <button
                 onClick={() => setMobileFiltersOpen(true)}
@@ -197,7 +153,7 @@ export default function Search() {
               </button>
             </div>
 
-            {processedRepos.length === 0 ? (
+            {totalResults === 0 ? (
               <EmptyState
                 type="no-results"
                 message="Try adjusting your stars count, language selection, or searching with another keyword expression."

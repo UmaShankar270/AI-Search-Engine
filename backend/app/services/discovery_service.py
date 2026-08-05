@@ -6,7 +6,9 @@ from app.services.providers import (
     GitLabProvider,
     CodebergProvider,
     BitbucketProvider,
-    SourceForgeProvider
+    SourceForgeProvider,
+    HuggingFaceProvider,
+    PapersWithCodeProvider
 )
 
 logger = logging.getLogger(__name__)
@@ -18,40 +20,63 @@ class DiscoveryService:
             "gitlab": GitLabProvider(),
             "codeberg": CodebergProvider(),
             "bitbucket": BitbucketProvider(),
-            "sourceforge": SourceForgeProvider()
+            "sourceforge": SourceForgeProvider(),
+            "huggingface": HuggingFaceProvider(),
+            "paperswithcode": PapersWithCodeProvider()
         }
+        self._executor = ThreadPoolExecutor(max_workers=len(self.providers))
 
     def search_all_platforms(
         self,
         query: str,
         language: Optional[str] = None,
         page: int = 1,
-        per_page: int = 10
+        per_page: int = 10,
+        sortBy: Optional[str] = None
     ) -> list[dict[str, Any]]:
         """Concurrently fetch repositories from all platforms."""
         results = []
         
-        # Parallel execution using a ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=len(self.providers)) as executor:
-            future_to_platform = {
-                executor.submit(
-                    provider.search,
-                    query=query,
-                    language=language,
-                    page=page,
-                    per_page=per_page
-                ): platform
-                for platform, provider in self.providers.items()
-            }
-            
-            for future in as_completed(future_to_platform):
-                platform = future_to_platform[future]
-                try:
-                    platform_results = future.result()
-                    logger.info("Retrieved %d projects from %s", len(platform_results), platform)
-                    results.extend(platform_results)
-                except Exception as exc:
-                    logger.error("Platform search failed for %s: %s", platform, str(exc))
+        def safe_search(provider, **kwargs):
+            import inspect
+            sig = inspect.signature(provider.search)
+            if "sort" in sig.parameters:
+                return provider.search(**kwargs)
+            else:
+                kwargs.pop("sort", None)
+                return provider.search(**kwargs)
+
+        # Parallel execution using a shared ThreadPoolExecutor
+        future_to_platform = {
+            self._executor.submit(
+                safe_search,
+                provider,
+                query=query,
+                language=language,
+                page=page,
+                per_page=per_page,
+                sort=sortBy
+            ): platform
+            for platform, provider in self.providers.items()
+        }
+        
+        from concurrent.futures import wait
+        done, not_done = wait(future_to_platform.keys(), timeout=3.0)
+
+        for future in done:
+            platform = future_to_platform[future]
+            try:
+                platform_results = future.result()
+                logger.info("Retrieved %d projects from %s", len(platform_results), platform)
+                results.extend(platform_results)
+            except Exception as exc:
+                logger.error("Platform search failed for %s: %s", platform, str(exc))
+
+        if not_done:
+            logger.warning("Platform search timed out after 3.0 seconds for platforms: %s. Returning accumulated results.", [future_to_platform[f] for f in not_done])
+            for fut in not_done:
+                if not fut.done():
+                    fut.cancel()
                     
         return results
 

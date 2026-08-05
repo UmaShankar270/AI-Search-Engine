@@ -92,13 +92,23 @@ class SummaryGenerator:
         stars = self._get_repo_stars(repository)
 
         if not self._client:
-            # Fallback to local rule-based mock summary
-            desc_part = f": {description}" if description else " (no description available)"
+            desc_part = f": {description}" if description else ""
             lang_part = f" written in {language}" if language else ""
+            
+            domain_focus = "modularity, scalability, and robust software engineering"
+            desc_lower = description.lower()
+            if any(w in desc_lower for w in ["ai", "ml", "learning", "model", "neural", "tensor", "predict"]):
+                domain_focus = "streamlining machine learning workflows, neural network model deployment, and intelligence calculations"
+            elif any(w in desc_lower for w in ["web", "api", "rest", "graphql", "server", "http", "react", "vue"]):
+                domain_focus = "building high-performance web applications, client-server communications, and responsive user interfaces"
+            elif any(w in desc_lower for w in ["data", "db", "sql", "nosql", "postgres", "query", "analytics"]):
+                domain_focus = "structured data processing, scalable query execution, and robust database storage management"
+            elif any(w in desc_lower for w in ["tool", "utility", "script", "cli", "automation"]):
+                domain_focus = "developer productivity automation, clean command-line interfaces, and scripting helpers"
+                
             return (
-                f"{name} is an open-source repository{lang_part} "
-                f"with {stars} stars{desc_part}. "
-                "It is optimized for modularity and scalability."
+                f"{name} is a premium open-source project{lang_part} with {stars} stars. "
+                f"It is primarily focused on {domain_focus}.{desc_part}"
             )
 
         system_prompt = (

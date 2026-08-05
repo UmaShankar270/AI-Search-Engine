@@ -83,6 +83,20 @@ class AIFacade:
             readme_text=readme_text,
         )
 
+    def generate_repository_embeddings(self, repos: list[dict[str, Any]]) -> np.ndarray:
+        from ai.embeddings.strategies import CompositionStrategy
+        texts = []
+        for r in repos:
+            composed = CompositionStrategy.for_repository(
+                name=r.get("name"),
+                description=r.get("description"),
+                topics=r.get("topics"),
+                language=r.get("language")
+            )
+            texts.append(composed)
+        return self.generate_embeddings(texts)
+
+
     def warmup_embeddings(self) -> None:
         self._embedding_generator.warmup()
 
@@ -168,6 +182,9 @@ class AIFacade:
         self._search_engine.add_repositories(
             repositories=[{"repo_id": repo_id, "text": text, "metadata": metadata or {}}],
         )
+
+    def add_repositories(self, repositories: list[dict[str, Any]]) -> None:
+        self._search_engine.add_repositories(repositories)
 
     def add_embeddings(
         self,

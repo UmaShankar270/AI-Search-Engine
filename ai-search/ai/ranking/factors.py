@@ -325,6 +325,59 @@ class TechnologyMatch(BaseFactor):
         })
 
 
+class RepositoryTrust(BaseFactor):
+    name = "repository_trust"
+    label = "Repository Trust"
+
+    def compute(
+        self, repo: CandidateRepo, query: str = "", intent: Optional[str] = None
+    ) -> FactorScore:
+        score = 0.0
+        trusted_orgs = {"google", "facebook", "meta", "microsoft", "netflix", "hashicorp", "apache", "vercel", "airbnb", "uber", "aws", "docker", "kubernetes", "openjs-foundation", "github", "cloudflare"}
+        owner = repo.repo_id.split("/")[0].lower() if "/" in repo.repo_id else ""
+        if owner in trusted_orgs:
+            score += 0.6
+        if repo.contributors > 100:
+            score += 0.2
+        elif repo.contributors > 10:
+            score += 0.1
+        if repo.stars > 5000:
+            score += 0.2
+        elif repo.stars > 500:
+            score += 0.1
+        score = min(1.0, score)
+        return self._make_score(score, {"owner": owner, "trusted": owner in trusted_orgs})
+
+
+class ProjectMaturity(BaseFactor):
+    name = "project_maturity"
+    label = "Project Maturity"
+
+    def compute(
+        self, repo: CandidateRepo, query: str = "", intent: Optional[str] = None
+    ) -> FactorScore:
+        score = 0.5
+        is_archived = False
+        if repo.metadata:
+            is_archived = bool(repo.metadata.get("archived") or repo.metadata.get("is_archived"))
+        if is_archived:
+            score -= 0.4
+        if repo.releases_last_year > 5:
+            score += 0.3
+        elif repo.releases_last_year > 0:
+            score += 0.15
+        if repo.created_at:
+            try:
+                created = datetime.fromisoformat(repo.created_at.replace("Z", "+00:00"))
+                days = (datetime.now().astimezone() - created).days
+                if days > 1000:
+                    score += 0.2
+            except Exception:
+                pass
+        score = max(0.0, min(1.0, score))
+        return self._make_score(score, {"archived": is_archived, "releases": repo.releases_last_year})
+
+
 FACTOR_CLASSES: list[type[BaseFactor]] = [
     SemanticSimilarity,
     GitHubStars,
@@ -344,4 +397,6 @@ FACTOR_CLASSES: list[type[BaseFactor]] = [
     PopularityTrend,
     TechnologyMatch,
     UserIntentMatch,
+    RepositoryTrust,
+    ProjectMaturity,
 ]

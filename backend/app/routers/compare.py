@@ -1,5 +1,7 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy.orm import Session
+from app.database import get_db
 from pydantic import BaseModel
 from app.services.discovery_service import DiscoveryService
 
@@ -21,13 +23,51 @@ def _resolve_repo_ref(repo_value: str, owner_value: str | None) -> str:
         return f"{owner_value}/{repo_value}"
     raise HTTPException(status_code=422, detail="Both repository and owner are required")
 
+def _resolve_repo_details_with_fallback(discovery: DiscoveryService, db: Session, platform: str, owner: str, repo: str) -> dict | None:
+    data = discovery.get_repo_details(platform, owner, repo)
+    if not data and db:
+        try:
+            from app.database_models import SearchCache
+            import json
+            caches = db.query(SearchCache).all()
+            for c in caches:
+                try:
+                    payload = json.loads(c.response)
+                    results_list = payload if isinstance(payload, list) else payload.get("results", [])
+                    matched = next((r for r in results_list if r.get("full_name") == f"{owner}/{repo}"), None)
+                    if matched:
+                        return {
+                            "name": matched.get("name"),
+                            "full_name": matched.get("full_name"),
+                            "owner": matched.get("owner"),
+                            "description": matched.get("description"),
+                            "stars": matched.get("stars", 0),
+                            "forks": matched.get("forks", 0),
+                            "watchers": matched.get("watchers", 0),
+                            "language": matched.get("language") or "Unknown",
+                            "open_issues": matched.get("open_issues", 0),
+                            "url": matched.get("url"),
+                            "platform": matched.get("platform") or "GitHub",
+                            "topics": matched.get("topics") or [],
+                            "last_updated": matched.get("last_updated") or "",
+                            "license": matched.get("license"),
+                            "default_branch": "main",
+                            "readmeHtml": f"<h1>{matched.get('name')}</h1><p>{matched.get('description')}</p>"
+                        }
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    return data
+
 @router.get("/compare")
 def compare(
     request: Request,
     repo1: str,
     repo2: str,
     platform1: str = "github",
-    platform2: str = "github"
+    platform2: str = "github",
+    db: Session = Depends(get_db)
 ):
     if "/" not in repo1 or "/" not in repo2:
         raise HTTPException(status_code=422, detail="Both repositories must be in 'owner/repo' format")
@@ -36,8 +76,8 @@ def compare(
     owner2, repo_name2 = repo2.split("/")
 
     discovery = DiscoveryService()
-    data1 = discovery.get_repo_details(platform1, owner1, repo_name1)
-    data2 = discovery.get_repo_details(platform2, owner2, repo_name2)
+    data1 = _resolve_repo_details_with_fallback(discovery, db, platform1, owner1, repo_name1)
+    data2 = _resolve_repo_details_with_fallback(discovery, db, platform2, owner2, repo_name2)
 
     if not data1 or not data2:
         raise HTTPException(
@@ -48,7 +88,7 @@ def compare(
     return _generate_comparison_response(request, data1, data2)
 
 @router.post("/compare")
-def compare_post(request: Request, payload: CompareRequest):
+def compare_post(request: Request, payload: CompareRequest, db: Session = Depends(get_db)):
     repo_ref1 = _resolve_repo_ref(payload.repo_a, payload.owner_a)
     repo_ref2 = _resolve_repo_ref(payload.repo_b, payload.owner_b)
     platform_a = payload.platform_a or "github"
@@ -58,8 +98,8 @@ def compare_post(request: Request, payload: CompareRequest):
     owner2, repo_name2 = repo_ref2.split("/")
 
     discovery = DiscoveryService()
-    data1 = discovery.get_repo_details(platform_a, owner1, repo_name1)
-    data2 = discovery.get_repo_details(platform_b, owner2, repo_name2)
+    data1 = _resolve_repo_details_with_fallback(discovery, db, platform_a, owner1, repo_name1)
+    data2 = _resolve_repo_details_with_fallback(discovery, db, platform_b, owner2, repo_name2)
 
     if not data1 or not data2:
         raise HTTPException(

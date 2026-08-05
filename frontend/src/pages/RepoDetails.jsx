@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getRepositoryDetails } from '../services/api';
 
@@ -18,6 +18,8 @@ import ErrorState from '../components/Error/ErrorState';
 export default function RepoDetails() {
   const { owner, repo } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const platform = searchParams.get('platform') || 'github';
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +35,7 @@ export default function RepoDetails() {
 
     async function fetchDetails() {
       try {
-        const fetched = await getRepositoryDetails(owner, repo);
+        const fetched = await getRepositoryDetails(owner, repo, platform);
         if (!fetched) {
           throw new Error('Repository details not found');
         }
@@ -56,7 +58,7 @@ export default function RepoDetails() {
     return () => {
       active = false;
     };
-  }, [owner, repo]);
+  }, [owner, repo, platform]);
 
   if (loading) {
     return (

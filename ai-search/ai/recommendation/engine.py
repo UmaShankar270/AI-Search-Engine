@@ -131,15 +131,23 @@ class RecommendationEngine:
         for score, repo in top:
             rid = repo.get("repo_id", "")
             lang = repo.get("language", "")
+            stars = repo.get("stars", 0) or 0
+            
+            reasons = [f"Strong semantic match ({score:.1%})"]
+            if stars > 1000:
+                reasons.append(f"Highly popular ({stars} stars)")
+            if lang and lang.lower() != "unknown":
+                reasons.append(f"Built with {lang}")
+                
             recommendations.append(
                 Recommendation(
                     repo_id=rid,
                     score=score,
-                    reason=f"Semantic similarity {score:.3f} to query",
+                    reason="; ".join(reasons),
                     similarity_score=score,
                     language=lang,
                     matched_topics=repo.get("topics") or [],
-                    metadata={"stars": repo.get("stars", 0)},
+                    metadata={"stars": stars},
                 )
             )
 

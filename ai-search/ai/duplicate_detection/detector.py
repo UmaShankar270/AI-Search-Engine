@@ -21,8 +21,18 @@ class DuplicateDetector:
         s2_clean = s2.strip().lower()
         if s1_clean == s2_clean:
             return 1.0
-        dist = TextUtils.levenshtein_distance(s1_clean, s2_clean)
 
+        # Token Jaccard similarity for long texts to avoid O(N*M) Levenshtein bottleneck
+        if len(s1_clean) >= 50 or len(s2_clean) >= 50:
+            w1 = set(s1_clean.split())
+            w2 = set(s2_clean.split())
+            if not w1 or not w2:
+                return 0.0
+            intersection = w1.intersection(w2)
+            union = w1.union(w2)
+            return len(intersection) / len(union)
+
+        dist = TextUtils.levenshtein_distance(s1_clean, s2_clean)
         max_len = max(len(s1_clean), len(s2_clean))
         return 1.0 - (dist / max_len)
 

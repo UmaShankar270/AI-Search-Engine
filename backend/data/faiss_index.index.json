@@ -1,358 +1,531 @@
 {
   "repo_to_vector": {
-    "react/react": 4152486594209661566,
-    "vercel/next.js": 548316663157538459,
-    "typescript-cheatsheets/react": 2529408745587097230,
-    "duxianwei520/react": 7737735981865195555,
-    "primer/react": 2619978426633460452,
-    "videojs/video.js": 264519824275087364,
-    "ATH-MaaS/Pixelle-Video": 9138062236774800821,
-    "WEIFENG2333/VideoCaptioner": 4495416245154028956,
-    "ytdl-org/youtube-dl": 1487155457326867396,
-    "k4yt3x/video2x": 8461016794759021303
+    "RasaHQ/rasa": 1601729967717727019,
+    "facebookresearch/llama-recipes": 2664098469072036382,
+    "yogeshpandey586/chatbot-intent-classifier": 8724727028591336623,
+    "satvikag/chatbot": 6954412665432187786,
+    "npc-engine/exported-bart-light-gail-chatbot": 2559946969035599005,
+    "scikit-learn/scikit-learn": 5609166400493125340,
+    "pytorch/pytorch": 168550619328293968
   },
   "vector_to_repo": {
-    "4152486594209661566": "react/react",
-    "548316663157538459": "vercel/next.js",
-    "2529408745587097230": "typescript-cheatsheets/react",
-    "7737735981865195555": "duxianwei520/react",
-    "2619978426633460452": "primer/react",
-    "264519824275087364": "videojs/video.js",
-    "9138062236774800821": "ATH-MaaS/Pixelle-Video",
-    "4495416245154028956": "WEIFENG2333/VideoCaptioner",
-    "1487155457326867396": "ytdl-org/youtube-dl",
-    "8461016794759021303": "k4yt3x/video2x"
+    "1601729967717727019": "RasaHQ/rasa",
+    "2664098469072036382": "facebookresearch/llama-recipes",
+    "8724727028591336623": "yogeshpandey586/chatbot-intent-classifier",
+    "6954412665432187786": "satvikag/chatbot",
+    "2559946969035599005": "npc-engine/exported-bart-light-gail-chatbot",
+    "5609166400493125340": "scikit-learn/scikit-learn",
+    "168550619328293968": "pytorch/pytorch"
   },
   "metadata": {
-    "react/react": {
-      "name": "react",
-      "full_name": "react/react",
-      "owner": "react",
-      "description": "The library for web and native user interfaces.",
-      "stars": 246926,
-      "forks": 51180,
-      "watchers": 246926,
-      "language": "JavaScript",
-      "open_issues": 1237,
-      "url": "https://github.com/react/react",
-      "platform": "GitHub",
-      "topics": [
-        "declarative",
-        "frontend",
-        "javascript",
-        "library",
-        "react",
-        "ui"
-      ],
-      "last_updated": "2026-08-03T11:21:41Z",
-      "license": "MIT License",
-      "semantic_score": 0.39358317852020264,
-      "matchScore": 65,
-      "aiScore": 65,
-      "healthScore": 83,
-      "popularityScore": 96,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "vercel/next.js": {
-      "name": "next.js",
-      "full_name": "vercel/next.js",
-      "owner": "vercel",
-      "description": "The React Framework",
-      "stars": 141310,
-      "forks": 31632,
-      "watchers": 141310,
-      "language": "JavaScript",
-      "open_issues": 4236,
-      "url": "https://github.com/vercel/next.js",
-      "platform": "GitHub",
-      "topics": [
-        "blog",
-        "browser",
-        "compiler",
-        "components",
-        "hybrid",
-        "nextjs",
-        "node",
-        "react",
-        "server-rendering",
-        "ssg",
-        "static",
-        "static-site-generator",
-        "universal",
-        "vercel"
-      ],
-      "last_updated": "2026-08-03T11:44:04Z",
-      "license": "MIT License",
-      "semantic_score": 0.42977362871170044,
-      "matchScore": 65,
-      "aiScore": 65,
-      "healthScore": 82,
-      "popularityScore": 96,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "typescript-cheatsheets/react": {
-      "name": "react",
-      "full_name": "typescript-cheatsheets/react",
-      "owner": "typescript-cheatsheets",
-      "description": "Cheatsheets for experienced React developers getting started with TypeScript",
-      "stars": 47090,
-      "forks": 4283,
-      "watchers": 47090,
-      "language": "TypeScript",
+    "RasaHQ/rasa": {
+      "name": "rasa",
+      "full_name": "RasaHQ/rasa",
+      "owner": "RasaHQ",
+      "description": "Papers with Code repository. Framework: PyTorch. Open source machine learning framework to automate text- and voice-based conversations. Framework: PyTorch.",
+      "stars": 16500,
+      "forks": 4200,
+      "watchers": 16500,
+      "language": "Python",
       "open_issues": 0,
-      "url": "https://github.com/typescript-cheatsheets/react",
-      "platform": "GitHub",
+      "url": "https://github.com/RasaHQ/rasa",
+      "platform": "Papers with Code",
       "topics": [
-        "cheatsheet",
-        "guide",
-        "react",
-        "typescript"
+        "PyTorch"
       ],
-      "last_updated": "2026-08-03T10:47:02Z",
-      "license": "MIT License",
-      "semantic_score": 0.30664151906967163,
-      "matchScore": 60,
-      "aiScore": 60,
-      "healthScore": 80,
-      "popularityScore": 92,
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.061401285231113434,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "rasa",
+            "url": "https://github.com/RasaHQ/rasa",
+            "stars": 16500,
+            "forks": 4200,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 50.4,
+      "aiScore": 50.4,
+      "healthScore": 78.7,
+      "popularityScore": 87.0,
       "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "duxianwei520/react": {
-      "name": "react",
-      "full_name": "duxianwei520/react",
-      "owner": "duxianwei520",
-      "description": " React+vite+redux+ant design+axios+less\u5168\u5bb6\u6876\u540e\u53f0\u7ba1\u7406\u6846\u67b6",
-      "stars": 5334,
-      "forks": 1828,
-      "watchers": 5334,
-      "language": "JavaScript",
-      "open_issues": 23,
-      "url": "https://github.com/duxianwei520/react",
-      "platform": "GitHub",
-      "topics": [
-        "ant-design-pro",
-        "antd",
-        "babel",
-        "es6",
-        "es7",
-        "react",
-        "redux",
-        "vite"
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Trusted organization"
       ],
-      "last_updated": "2026-08-03T04:33:26Z",
-      "license": "MIT License",
-      "semantic_score": 0.40138301253318787,
-      "matchScore": 59,
-      "aiScore": 59,
-      "healthScore": 76,
-      "popularityScore": 70,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
+      "rank": 3
     },
-    "primer/react": {
-      "name": "react",
-      "full_name": "primer/react",
-      "owner": "primer",
-      "description": "An implementation of GitHub's Primer Design System using React",
-      "stars": 3881,
-      "forks": 674,
-      "watchers": 3881,
-      "language": "TypeScript",
-      "open_issues": 77,
-      "url": "https://github.com/primer/react",
-      "platform": "GitHub",
-      "topics": [
-        "component-library",
-        "design-system",
-        "primer",
-        "react"
-      ],
-      "last_updated": "2026-08-01T06:30:20Z",
-      "license": "MIT License",
-      "semantic_score": 0.40487951040267944,
-      "matchScore": 55,
-      "aiScore": 55,
-      "healthScore": 68,
-      "popularityScore": 59,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "videojs/video.js": {
-      "id": "667006",
-      "name": "video.js",
-      "full_name": "videojs/video.js",
-      "owner": "videojs",
-      "description": "Video.js - open source HTML5 video player",
-      "stars": 39836,
-      "forks": 7484,
-      "watchers": 39836,
-      "language": "JavaScript",
-      "open_issues": 662,
-      "url": "https://github.com/videojs/video.js",
-      "platform": "GitHub",
-      "topics": [
-        "dash",
-        "hls",
-        "html",
-        "html5",
-        "html5-audio",
-        "html5-video",
-        "javascript",
-        "player",
-        "video",
-        "video-player",
-        "videojs"
-      ],
-      "last_updated": "2026-08-03T12:29:31Z",
-      "license": "Other",
-      "avatar": "https://avatars.githubusercontent.com/u/3287189?v=4",
-      "matchScore": 65,
-      "aiScore": 65,
-      "healthScore": 80,
-      "popularityScore": 92,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "ATH-MaaS/Pixelle-Video": {
-      "id": "1091534692",
-      "name": "Pixelle-Video",
-      "full_name": "ATH-MaaS/Pixelle-Video",
-      "owner": "ATH-MaaS",
-      "description": "\ud83d\ude80 AI \u5168\u81ea\u52a8\u77ed\u89c6\u9891\u5f15\u64ce | AI Fully Automated Short Video Engine",
-      "stars": 26394,
-      "forks": 3808,
-      "watchers": 26394,
+    "facebookresearch/llama-recipes": {
+      "name": "llama-recipes",
+      "full_name": "facebookresearch/llama-recipes",
+      "owner": "facebookresearch",
+      "description": "Papers with Code repository. Framework: PyTorch. Llama 2 & 3 chatbot and fine-tuning recipes. Framework: PyTorch.",
+      "stars": 8200,
+      "forks": 1200,
+      "watchers": 8200,
       "language": "Python",
-      "open_issues": 150,
-      "url": "https://github.com/ATH-MaaS/Pixelle-Video",
-      "platform": "GitHub",
+      "open_issues": 0,
+      "url": "https://github.com/facebookresearch/llama-recipes",
+      "platform": "Papers with Code",
       "topics": [
-        "aigc",
-        "comfyui",
-        "image-generation",
-        "tts",
-        "video-generation"
+        "PyTorch"
       ],
-      "last_updated": "2026-08-03T12:26:01Z",
-      "license": "Apache License 2.0",
-      "avatar": "https://avatars.githubusercontent.com/u/172576026?v=4",
-      "matchScore": 61,
-      "aiScore": 61,
-      "healthScore": 79,
-      "popularityScore": 88,
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.1042875200510025,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          },
+          {
+            "repo_id": "llama-recipes",
+            "url": "https://github.com/facebookresearch/llama-recipes",
+            "stars": 8200,
+            "forks": 1200,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 48.1,
+      "aiScore": 48.1,
+      "healthScore": 76.5,
+      "popularityScore": 74.5,
       "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption"
+      ],
+      "rank": 4
     },
-    "WEIFENG2333/VideoCaptioner": {
-      "id": "881171866",
-      "name": "VideoCaptioner",
-      "full_name": "WEIFENG2333/VideoCaptioner",
-      "owner": "WEIFENG2333",
-      "description": "\ud83c\udfac \u5361\u5361\u5b57\u5e55\u52a9\u624b | VideoCaptioner - \u57fa\u4e8e LLM \u7684\u667a\u80fd\u5b57\u5e55\u52a9\u624b - \u89c6\u9891\u5b57\u5e55\u751f\u6210\u3001\u65ad\u53e5\u3001\u6821\u6b63\u3001\u5b57\u5e55\u7ffb\u8bd1\u5168\u6d41\u7a0b\u5904\u7406\uff01- A powered tool for easy and efficient video subtitling.",
-      "stars": 15498,
-      "forks": 1329,
-      "watchers": 15498,
+    "yogeshpandey586/chatbot-intent-classifier": {
+      "name": "chatbot-intent-classifier",
+      "full_name": "yogeshpandey586/chatbot-intent-classifier",
+      "owner": "yogeshpandey586",
+      "description": "Hugging Face Model Hub repository. Likes: 1. Downloads: 132. Tags: transformers, safetensors, modernbert, text-classification, intent-classification, chatbot.",
+      "stars": 1,
+      "forks": 6,
+      "watchers": 1,
       "language": "Python",
-      "open_issues": 191,
-      "url": "https://github.com/WEIFENG2333/VideoCaptioner",
-      "platform": "GitHub",
+      "open_issues": 0,
+      "url": "https://huggingface.co/yogeshpandey586/chatbot-intent-classifier",
+      "platform": "Hugging Face",
       "topics": [
-        "ai",
-        "subtitle",
-        "translate",
-        "video-subtile"
+        "transformers",
+        "safetensors",
+        "modernbert",
+        "text-classification",
+        "intent-classification",
+        "chatbot",
+        "enterprise-chatbot",
+        "nlp",
+        "en",
+        "base_model:answerdotai/ModernBERT-base",
+        "base_model:finetune:answerdotai/ModernBERT-base",
+        "license:apache-2.0"
       ],
-      "last_updated": "2026-08-03T09:04:27Z",
-      "license": "GNU General Public License v3.0",
-      "avatar": "https://avatars.githubusercontent.com/u/61730227?v=4",
-      "matchScore": 60,
-      "aiScore": 60,
-      "healthScore": 78,
-      "popularityScore": 79,
+      "last_updated": "2026-07-31T19:06:04.000Z",
+      "license": "APACHE-2.0",
+      "semantic_score": 0.003967630211263895,
+      "matchScore": 46.1,
+      "aiScore": 46.1,
+      "healthScore": 54.2,
+      "popularityScore": 12.8,
       "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
+        "Recently maintained",
+        "High documentation quality"
+      ],
+      "rank": 4
     },
-    "ytdl-org/youtube-dl": {
-      "id": "1039520",
-      "name": "youtube-dl",
-      "full_name": "ytdl-org/youtube-dl",
-      "owner": "ytdl-org",
-      "description": "Command-line program to download videos from YouTube.com and other video sites",
-      "stars": 140850,
-      "forks": 10668,
-      "watchers": 140850,
+    "satvikag/chatbot": {
+      "name": "chatbot",
+      "full_name": "satvikag/chatbot",
+      "owner": "satvikag",
+      "description": "Hugging Face Model Hub repository. Likes: 37. Downloads: 94. Tags: transformers, pytorch, gpt2, text-generation, conversational, license:mit.",
+      "stars": 37,
+      "forks": 4,
+      "watchers": 37,
       "language": "Python",
-      "open_issues": 4131,
-      "url": "https://github.com/ytdl-org/youtube-dl",
-      "platform": "GitHub",
-      "topics": [],
-      "last_updated": "2026-08-03T10:50:42Z",
-      "license": "The Unlicense",
-      "avatar": "https://avatars.githubusercontent.com/u/48381040?v=4",
-      "matchScore": 60,
-      "aiScore": 60,
-      "healthScore": 82,
-      "popularityScore": 94,
-      "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
-    },
-    "k4yt3x/video2x": {
-      "id": "122758193",
-      "name": "video2x",
-      "full_name": "k4yt3x/video2x",
-      "owner": "k4yt3x",
-      "description": "A machine learning-based video super resolution and frame interpolation framework. Est. Hack the Valley II, 2018.",
-      "stars": 20716,
-      "forks": 1788,
-      "watchers": 20716,
-      "language": "C++",
-      "open_issues": 124,
-      "url": "https://github.com/k4yt3x/video2x",
-      "platform": "GitHub",
+      "open_issues": 0,
+      "url": "https://huggingface.co/satvikag/chatbot",
+      "platform": "Hugging Face",
       "topics": [
-        "anime4k",
-        "frame-interpolation",
-        "machine-learning",
-        "neural-networks",
-        "realcugan",
-        "realesrgan",
-        "rife",
-        "super-resoluion",
-        "upscale-video",
-        "vulkan"
+        "transformers",
+        "pytorch",
+        "gpt2",
+        "text-generation",
+        "conversational",
+        "license:mit",
+        "text-generation-inference",
+        "endpoints_compatible",
+        "region:us",
+        "deploy:azure"
       ],
-      "last_updated": "2026-08-03T11:14:56Z",
-      "license": "GNU Affero General Public License v3.0",
-      "avatar": "https://avatars.githubusercontent.com/u/21986859?v=4",
-      "matchScore": 60,
-      "aiScore": 60,
-      "healthScore": 79,
-      "popularityScore": 82,
+      "last_updated": "2021-06-04T20:08:11.000Z",
+      "license": "MIT",
+      "semantic_score": 0.07657666504383087,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          },
+          {
+            "repo_id": "chatbot",
+            "url": "https://huggingface.co/satvikag/chatbot",
+            "stars": 37,
+            "forks": 4,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 35.9,
+      "aiScore": 35.9,
+      "healthScore": 54.2,
+      "popularityScore": 18.5,
       "matchReasonBullets": [
-        "Highly popular project with active adoption",
-        "Well-maintained repository with regular commits"
-      ]
+        "Recently maintained",
+        "High documentation quality",
+        "Stable release maturity"
+      ],
+      "rank": 5
+    },
+    "npc-engine/exported-bart-light-gail-chatbot": {
+      "name": "exported-bart-light-gail-chatbot",
+      "full_name": "npc-engine/exported-bart-light-gail-chatbot",
+      "owner": "npc-engine",
+      "description": "Hugging Face Model Hub repository. Likes: 2. Downloads: 0. Tags: onnx, conversational, npc-engine, en, arxiv:2004.13796, license:mit.",
+      "stars": 2,
+      "forks": 0,
+      "watchers": 2,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://huggingface.co/npc-engine/exported-bart-light-gail-chatbot",
+      "platform": "Hugging Face",
+      "topics": [
+        "onnx",
+        "conversational",
+        "npc-engine",
+        "en",
+        "arxiv:2004.13796",
+        "license:mit",
+        "region:us"
+      ],
+      "last_updated": "2022-05-24T14:10:35.000Z",
+      "license": "MIT",
+      "semantic_score": 0.1244141012430191,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "exported-bart-light-gail-chatbot",
+            "url": "https://huggingface.co/npc-engine/exported-bart-light-gail-chatbot",
+            "stars": 2,
+            "forks": 0,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 37.6,
+      "aiScore": 37.6,
+      "healthScore": 54.2,
+      "popularityScore": 9.1,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Stable release maturity"
+      ],
+      "rank": 5
+    },
+    "scikit-learn/scikit-learn": {
+      "name": "scikit-learn",
+      "full_name": "scikit-learn/scikit-learn",
+      "owner": "scikit-learn",
+      "description": "Papers with Code repository. Framework: NumPy. Machine learning in Python. Simple and efficient tools for predictive data analysis. Framework: NumPy.",
+      "stars": 57000,
+      "forks": 24000,
+      "watchers": 57000,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/scikit-learn/scikit-learn",
+      "platform": "Papers with Code",
+      "topics": [
+        "NumPy"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.11833290755748749,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "scikit-learn",
+            "url": "https://github.com/scikit-learn/scikit-learn",
+            "stars": 57000,
+            "forks": 24000,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 53.3,
+      "aiScore": 53.3,
+      "healthScore": 81.1,
+      "popularityScore": 96.8,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Active contributors",
+        "Trusted organization"
+      ],
+      "rank": 1
+    },
+    "pytorch/pytorch": {
+      "name": "pytorch",
+      "full_name": "pytorch/pytorch",
+      "owner": "pytorch",
+      "description": "Papers with Code repository. Framework: PyTorch. Tensors and Dynamic neural networks in Python with strong GPU acceleration. Framework: PyTorch.",
+      "stars": 78000,
+      "forks": 21000,
+      "watchers": 78000,
+      "language": "Python",
+      "open_issues": 0,
+      "url": "https://github.com/pytorch/pytorch",
+      "platform": "Papers with Code",
+      "topics": [
+        "PyTorch"
+      ],
+      "last_updated": "",
+      "license": null,
+      "semantic_score": 0.07013183832168579,
+      "metadata": {
+        "mirrors": [
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          },
+          {
+            "repo_id": "pytorch",
+            "url": "https://github.com/pytorch/pytorch",
+            "stars": 78000,
+            "forks": 21000,
+            "language": "Python"
+          }
+        ]
+      },
+      "matchScore": 52.6,
+      "aiScore": 52.6,
+      "healthScore": 81.7,
+      "popularityScore": 96.5,
+      "matchReasonBullets": [
+        "Recently maintained",
+        "High documentation quality",
+        "Strong community adoption",
+        "Active contributors",
+        "Trusted organization"
+      ],
+      "rank": 2
     }
   }
 }

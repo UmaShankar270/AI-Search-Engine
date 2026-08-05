@@ -86,7 +86,11 @@ async def lifespan(app: FastAPI):
     if model is not None and hasattr(model, "unload"):
         model.unload()
 
-    logger.info("AI model resources unloaded successfully.")
+    logger.info("AI model resources unloaded successfully."
+    
+    
+)
+
 
 
 Base.metadata.create_all(bind=engine)

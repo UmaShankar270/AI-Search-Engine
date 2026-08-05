@@ -355,20 +355,34 @@ class SemanticSearchEngine:
         query_lower = query.lower().strip()
 
         for hit in hits:
-            boost = False
-            if hit.repo_id and query_lower in hit.repo_id.lower():
-                boost = True
+            boost_multiplier = 1.0
+            if hit.repo_id:
+                repo_id_lower = hit.repo_id.lower()
+                name_only = repo_id_lower.split("/")[-1] if "/" in repo_id_lower else repo_id_lower
+                if query_lower == name_only:
+                    boost_multiplier = max(boost_multiplier, 1.8)
+                elif query_lower in repo_id_lower:
+                    boost_multiplier = max(boost_multiplier, 1.3)
+                    
             if hit.metadata:
-                name = hit.metadata.get("name", "")
-                if query_lower in name.lower():
-                    boost = True
-                topics = hit.metadata.get("topics", []) or []
-                for topic in topics:
-                    if query_lower in topic.lower():
-                        boost = True
-                        break
-            if boost:
-                hit.score = min(1.0, hit.score * self._boost_factor)
+                name = hit.metadata.get("name", "").lower()
+                if query_lower == name:
+                    boost_multiplier = max(boost_multiplier, 2.0)
+                elif query_lower in name:
+                    boost_multiplier = max(boost_multiplier, 1.4)
+                    
+                topics = [t.lower() for t in (hit.metadata.get("topics", []) or [])]
+                if query_lower in topics:
+                    boost_multiplier = max(boost_multiplier, 1.5)
+                elif any(query_lower in t for t in topics):
+                    boost_multiplier = max(boost_multiplier, 1.2)
+                    
+                lang = (hit.metadata.get("language") or "").lower()
+                if query_lower == lang:
+                    boost_multiplier = max(boost_multiplier, 1.3)
+
+            if boost_multiplier > 1.0:
+                hit.score = min(1.0, hit.score * self._boost_factor * boost_multiplier)
 
         hits.sort(key=lambda h: h.score, reverse=True)
         for i, hit in enumerate(hits):

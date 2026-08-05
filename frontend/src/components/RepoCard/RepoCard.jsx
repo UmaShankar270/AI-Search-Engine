@@ -59,6 +59,16 @@ export default function RepoCard({ repo }) {
       <div>
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center space-x-3 truncate">
+            {repo.rank && (
+              <span className={`flex items-center justify-center font-extrabold px-2.5 py-0.5 rounded-full border text-xs ${
+                repo.rank === 1 ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-350 dark:border-amber-900' :
+                repo.rank === 2 ? 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-900/40 dark:text-slate-350 dark:border-slate-800' :
+                repo.rank === 3 ? 'bg-amber-50 text-amber-700 border-amber-250 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50' :
+                'bg-brand-gray-100 text-brand-gray-600 border-brand-gray-200 dark:bg-brand-gray-950 dark:text-brand-gray-400 dark:border-brand-gray-800'
+              }`}>
+                #{repo.rank}
+              </span>
+            )}
             <img
               src={repo.avatar || 'https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=80&h=80&q=80'}
               alt={`${repo.owner} avatar`}
@@ -74,9 +84,9 @@ export default function RepoCard({ repo }) {
             </Link>
           </div>
 
-          {repo.matchScore && (
-            <div className={`flex items-center px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap ${getScoreStyle(repo.matchScore)}`}>
-              <span>{repo.matchScore}% Match</span>
+          {(repo.aiScore || repo.matchScore) && (
+            <div className={`flex items-center px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap ${getScoreStyle(repo.aiScore || repo.matchScore)}`}>
+              <span>AI Score: {Number(repo.aiScore || repo.matchScore).toFixed(1)}/100</span>
             </div>
           )}
         </div>
@@ -145,19 +155,19 @@ export default function RepoCard({ repo }) {
         <div className="flex flex-wrap gap-2 pt-1.5 w-full justify-between items-center">
           <div className="flex items-center space-x-1.5">
             <Link
-              to={`/repo/${repo.owner}/${repo.name}`}
+              to={`/repo/${repo.owner}/${repo.name}?platform=${repo.platform || 'github'}`}
               className="px-3 py-1.5 rounded-lg border border-brand-gray-200 dark:border-brand-gray-800 text-xs font-semibold bg-white dark:bg-brand-gray-900 text-brand-gray-700 dark:text-brand-gray-305 hover:bg-brand-gray-50 dark:hover:bg-brand-gray-850 hover:text-brand-gray-955 dark:hover:text-white transition-colors cursor-pointer shadow-sm"
             >
               View Details
             </Link>
 
             <a
-              href={`https://github.com/${repo.owner}/${repo.name}`}
+              href={repo.url || `https://github.com/${repo.owner}/${repo.name}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs text-brand-gray-405 hover:text-brand-gray-950 dark:hover:text-white transition-colors"
+              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs text-brand-gray-405 hover:text-brand-gray-955 dark:hover:text-white transition-colors"
             >
-              <span>GitHub</span>
+              <span>{repo.platform || 'GitHub'}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>

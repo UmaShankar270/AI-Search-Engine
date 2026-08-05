@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "weights": {
-    "semantic_similarity": 0.25,
-    "user_intent_match": 0.10,
+    "semantic_similarity": 0.22,
+    "user_intent_match": 0.07,
     "recent_activity": 0.08,
     "commit_frequency": 0.07,
     "issue_resolution_rate": 0.06,
@@ -18,7 +18,9 @@
     "fork_count": 0.02,
     "license_availability": 0.02,
     "popularity_trend": 0.02,
-    "repository_age": 0.02
+    "repository_age": 0.02,
+    "repository_trust": 0.03,
+    "project_maturity": 0.03
   },
   "normalization": {
     "semantic_similarity": {"method": "identity", "max_value": 1.0},
@@ -38,6 +40,8 @@
     "repository_health": {"method": "identity", "max_value": 1.0},
     "community_adoption": {"method": "identity", "max_value": 1.0},
     "popularity_trend": {"method": "sigmoid", "midpoint": 50, "k": 0.02},
-    "technology_match": {"method": "identity", "max_value": 1.0}
+    "technology_match": {"method": "identity", "max_value": 1.0},
+    "repository_trust": {"method": "identity", "max_value": 1.0},
+    "project_maturity": {"method": "identity", "max_value": 1.0}
   }
 }

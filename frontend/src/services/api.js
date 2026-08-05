@@ -48,6 +48,8 @@ const normalizeRepository = (repo, fallbackOwner = 'unknown', fallbackRepo = 're
     topics,
     url: repo.url || repo.html_url || `https://github.com/${owner}/${name}`,
     matchScore: repo.matchScore ?? 0,
+    aiScore: repo.aiScore ?? repo.matchScore ?? 0,
+    rank: repo.rank || null,
     matchReasonBullets: repo.matchReasonBullets || [],
     size: repo.size || null,
     defaultBranch: repo.defaultBranch || 'main',
@@ -108,7 +110,10 @@ export async function searchRepositories(query, filters = {}) {
     });
     const payload = response.data;
     const normalized = normalizeSearchResponse(payload);
-    return normalized;
+    return {
+      results: normalized,
+      totalCount: payload?.total_count ?? normalized.length
+    };
   } catch (error) {
     logApiError('searchRepositories', error);
 
@@ -139,16 +144,26 @@ export async function searchRepositories(query, filters = {}) {
       return hasKeyword || repo.matchScore > 60;
     });
 
-    return filtered;
+    const sortedFiltered = filtered.sort((a, b) => b.matchScore - a.matchScore).map((repo, idx) => ({
+      ...repo,
+      rank: idx + 1
+    }));
+
+    return {
+      results: sortedFiltered,
+      totalCount: sortedFiltered.length
+    };
   }
 }
 
 /**
  * GET /repo/{owner}/{repo}
  */
-export async function getRepositoryDetails(owner, repo) {
+export async function getRepositoryDetails(owner, repo, platform = 'github') {
   try {
-    const response = await apiClient.get(`/repo/${owner}/${repo}`);
+    const response = await apiClient.get(`/repo/${owner}/${repo}`, {
+      params: { platform }
+    });
     const payload = response.data;
     return normalizeRepository(payload, owner, repo);
   } catch (error) {

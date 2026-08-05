@@ -11,6 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
     setSearchQuery(query);
     navigate(`/search?q=${encodeURIComponent(query)}`);
