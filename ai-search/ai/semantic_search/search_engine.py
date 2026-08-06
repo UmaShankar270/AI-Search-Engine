@@ -298,9 +298,41 @@ class SemanticSearchEngine:
 
     def save(self, path: str) -> None:
         self._vector_index.save(path)
+        import json
+        meta_path = path + ".json"
+        try:
+            if hasattr(self._metadata_store, "_repo_to_vector"):
+                data = {
+                    "repo_to_vector": self._metadata_store._repo_to_vector,
+                    "vector_to_repo": {str(k): v for k, v in self._metadata_store._vector_to_repo.items()},
+                    "metadata": self._metadata_store._metadata
+                }
+                with open(meta_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                logger.info("Saved metadata store to %s", meta_path)
+        except Exception as e:
+            logger.error("Failed to save metadata to %s: %s", meta_path, str(e))
 
     def load(self, path: str) -> None:
         self._vector_index.load(path)
+        import json
+        from pathlib import Path
+        meta_path = path + ".json"
+        if Path(meta_path).exists():
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if hasattr(self._metadata_store, "_repo_to_vector"):
+                    self._metadata_store.clear()
+                    self._metadata_store._repo_to_vector.update(data.get("repo_to_vector", {}))
+                    vector_to_repo = {int(k): v for k, v in data.get("vector_to_repo", {}).items()}
+                    self._metadata_store._vector_to_repo.update(vector_to_repo)
+                    self._metadata_store._metadata.update(data.get("metadata", {}))
+                logger.info("Loaded metadata store from %s", meta_path)
+            except Exception as e:
+                logger.error("Failed to load metadata from %s: %s", meta_path, str(e))
+        else:
+            logger.warning("Metadata file %s not found", meta_path)
 
     def clear(self) -> None:
         self._vector_index.clear()

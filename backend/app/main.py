@@ -72,6 +72,42 @@ async def lifespan(app: FastAPI):
             facade.warmup_embeddings()
             app.state.ai_facade = facade
             logger.info("AIFacade successfully initialized and warmed up.")
+
+            # Auto-generate FAISS index if it is empty or does not exist
+            index_path = "data/faiss_index.index"
+            stats = facade.get_index_stats()
+            if stats.total_vectors == 0:
+                logger.info("FAISS index is empty or missing. Automatically generating seed index...")
+                try:
+                    from app.services.discovery_service import DiscoveryService
+                    discovery = DiscoveryService()
+                    seed_queries = ["chatbot", "video editor", "portfolio website", "ai assistant", "machine learning"]
+                    seed_repos = []
+                    for q in seed_queries:
+                        try:
+                            logger.info("Fetching seed repositories for query: '%s'", q)
+                            res = discovery.search_all_platforms(query=q, page=1, per_page=20)
+                            seed_repos.extend(res)
+                        except Exception as e:
+                            logger.warning("Failed to fetch seed repos for '%s': %s", q, e)
+                    
+                    if seed_repos:
+                        seen = set()
+                        unique_seeds = []
+                        for r in seed_repos:
+                            fn = r.get("full_name")
+                            if fn and fn not in seen:
+                                seen.add(fn)
+                                unique_seeds.append(r)
+                        
+                        logger.info("Indexing %d seed repositories...", len(unique_seeds))
+                        facade.add_repositories(unique_seeds)
+                        facade.save_index(index_path)
+                        logger.info("Successfully generated and saved seed FAISS index of size %d to %s", facade.get_index_stats().total_vectors, index_path)
+                    else:
+                        logger.warning("No seed repositories retrieved; FAISS index remains empty.")
+                except Exception as e:
+                    logger.error("Failed to automatically generate FAISS index: %s", e)
         except Exception as exc:
             logger.warning("AI warmup failed; continuing without AI facade: %s", exc)
             app.state.ai_facade = None

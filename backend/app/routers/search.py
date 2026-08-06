@@ -108,31 +108,50 @@ def apply_backend_filters(
     updated: Optional[str] = None,
     sortBy: Optional[str] = None
 ) -> list[dict[str, Any]]:
+    logger.info("[Stage 8: Backend Filters] Entering with %d repos, filters: language='%s', stars='%s', forks='%s', license='%s', updated='%s', sortBy='%s'", len(repos), language, stars, forks, license, updated, sortBy)
     filtered = list(repos)
     
     # 1. Language Filter
     if language and language != "All":
+        prev_len = len(filtered)
         filtered = [r for r in filtered if r.get("language", "").lower() == language.lower()]
+        logger.info("[Stage 8: Backend Filters] Language filter ('%s') entering: %d, leaving: %d (filtered %d due to language mismatch)", language, prev_len, len(filtered), prev_len - len(filtered))
+    else:
+        logger.info("[Stage 8: Backend Filters] Language filter skipped")
         
     # 2. Stars Filter
     if stars and stars != "All":
         try:
             min_stars = int(stars)
+            prev_len = len(filtered)
             filtered = [r for r in filtered if int(r.get("stars") or 0) >= min_stars]
+            logger.info("[Stage 8: Backend Filters] Stars filter (>=%d) entering: %d, leaving: %d (filtered %d due to low stars)", min_stars, prev_len, len(filtered), prev_len - len(filtered))
         except ValueError:
+            logger.info("[Stage 8: Backend Filters] Stars filter skipped due to invalid value '%s'", stars)
             pass
+    else:
+        logger.info("[Stage 8: Backend Filters] Stars filter skipped")
             
     # 3. Forks Filter
     if forks and forks != "All":
         try:
             min_forks = int(forks)
+            prev_len = len(filtered)
             filtered = [r for r in filtered if int(r.get("forks") or 0) >= min_forks]
+            logger.info("[Stage 8: Backend Filters] Forks filter (>=%d) entering: %d, leaving: %d (filtered %d due to low forks)", min_forks, prev_len, len(filtered), prev_len - len(filtered))
         except ValueError:
+            logger.info("[Stage 8: Backend Filters] Forks filter skipped due to invalid value '%s'", forks)
             pass
+    else:
+        logger.info("[Stage 8: Backend Filters] Forks filter skipped")
             
     # 4. License Filter
     if license and license != "All":
+        prev_len = len(filtered)
         filtered = [r for r in filtered if r.get("license") and str(r.get("license")).lower() == license.lower()]
+        logger.info("[Stage 8: Backend Filters] License filter ('%s') entering: %d, leaving: %d (filtered %d due to license mismatch or missing license)", license, prev_len, len(filtered), prev_len - len(filtered))
+    else:
+        logger.info("[Stage 8: Backend Filters] License filter skipped")
         
     # 5. Updated Filter (days ago)
     if updated and updated != "All":
@@ -142,6 +161,7 @@ def apply_backend_filters(
             now = datetime(2026, 8, 4, tzinfo=timezone.utc)
             limit_date = now - timedelta(days=days_limit)
             
+            prev_len = len(filtered)
             res = []
             for r in filtered:
                 lu_str = r.get("last_updated") or r.get("lastUpdated")
@@ -155,10 +175,15 @@ def apply_backend_filters(
                 else:
                     res.append(r)
             filtered = res
+            logger.info("[Stage 8: Backend Filters] Updated filter (pushed within %d days, limit_date=%s) entering: %d, leaving: %d (filtered %d due to push date limit)", days_limit, limit_date, prev_len, len(filtered), prev_len - len(filtered))
         except ValueError:
+            logger.info("[Stage 8: Backend Filters] Updated filter skipped due to invalid value '%s'", updated)
             pass
+    else:
+        logger.info("[Stage 8: Backend Filters] Updated filter skipped")
             
     # 6. Sorting
+    logger.info("[Stage 8: Backend Filters] Applying sorting by '%s'", sortBy)
     if sortBy == "stars":
         filtered.sort(key=lambda r: int(r.get("stars") or 0), reverse=True)
     elif sortBy == "forks":
@@ -178,6 +203,7 @@ def apply_backend_filters(
         # Default match / aiScore sorting
         filtered.sort(key=lambda r: r.get("matchScore", 0.0), reverse=True)
         
+    logger.info("[Stage 8: Backend Filters] Leaving: %d repos", len(filtered))
     return filtered
 
 QUERY_EXPANSIONS = {
@@ -235,7 +261,7 @@ def search(
         logger.info("Search cache HIT for key: %s", cache_key)
         all_results = json.loads(cached.response)
         
-        # Apply filters on cached results
+        # Apply filters on cached results (Stage 8 logging will be triggered inside apply_backend_filters)
         filtered_results = apply_backend_filters(
             all_results,
             language=language,
@@ -246,16 +272,21 @@ def search(
             sortBy=sortBy
         )
         
+        logger.info("[Stage 9: Pagination] (Cache Hit) Entering: filtered_results=%d, page=%d, per_page=%d", len(filtered_results), page, per_page)
         start_idx = (page - 1) * per_page
         end_idx = start_idx + per_page
         paginated_results = filtered_results[start_idx:end_idx]
-        return {
+        logger.info("[Stage 9: Pagination] (Cache Hit) Leaving: paginated_results=%d", len(paginated_results))
+
+        res_payload = {
             "source": "cache",
             "results": paginated_results,
             "total_count": len(filtered_results),
             "page": page,
             "per_page": per_page
         }
+        logger.info("[Stage 10: API Response] (Cache Hit) Leaving: total_count=%d, results_count=%d", res_payload["total_count"], len(res_payload["results"]))
+        return res_payload
 
     logger.info("Search cache MISS for key: %s. Running search pipeline...", cache_key)
 
@@ -317,12 +348,21 @@ def search(
         )
     logger.info("Keyword search (with query expansion) retrieved %d repositories in %.2fms", len(keyword_results), (time.perf_counter() - retrieval_start) * 1000)
 
-    # 4. Hybrid Retrieval - Semantic search from local database
+    # 4. Hybrid Retrieval - Semantic search from local database (Stage 6)
     semantic_results = []
+    logger.info("[Stage 6: Semantic Search] Entering with query='%s'", effective_query)
     if facade:
         try:
             sem_start = time.perf_counter()
+            if query_vector is not None:
+                logger.info("[Stage 6: Semantic Search] Generated query embedding of dimension: %d, shape: %s", len(query_vector), query_vector.shape)
+            
             sem_res = facade.search(query=effective_query, top_k=50)
+            
+            logger.info("[Stage 6: Semantic Search] Nearest neighbors from FAISS:")
+            for rank_idx, hit in enumerate(sem_res.results):
+                logger.info("  Rank %d: ID=%s, Cosine Similarity Score=%.4f", rank_idx + 1, hit.repo_id, hit.score)
+                
             for hit in sem_res.results:
                 meta = hit.metadata or {}
                 normalized = {
@@ -343,26 +383,35 @@ def search(
                     "semantic_score": float(hit.score)
                 }
                 semantic_results.append(normalized)
-            logger.info("Semantic search retrieved %d repositories in %.2fms", len(semantic_results), (time.perf_counter() - sem_start) * 1000)
+            logger.info("[Stage 6: Semantic Search] Retrieved semantic repositories: %s", [r["full_name"] for r in semantic_results])
+            logger.info("[Stage 6: Semantic Search] Retrieved %d repositories in %.2fms", len(semantic_results), (time.perf_counter() - sem_start) * 1000)
         except Exception as e:
-            logger.warning("Semantic search index search failed: %s", str(e))
+            logger.warning("[Stage 6: Semantic Search] index search failed: %s", str(e))
+    else:
+        logger.info("[Stage 6: Semantic Search] Skipped (AI Facade unavailable)")
 
-    # Merge results
+    logger.info("[Stage 6: Semantic Search] Leaving: semantic_results=%d", len(semantic_results))
+
+    # Merge results (Stage 4)
+    logger.info("[Stage 4: Multi-provider Merge] Entering: keyword_results=%d, semantic_results=%d", len(keyword_results), len(semantic_results))
     merged_results = keyword_results + semantic_results
-    logger.info("Total repositories retrieved (merged): %d", len(merged_results))
+    logger.info("[Stage 4: Multi-provider Merge] Leaving: merged_results=%d", len(merged_results))
 
     # If no results found, return baseline fallback mock data or empty list
     if not merged_results:
         logger.info("No repositories found in any platform. Returning empty list.")
-        return {
+        res_payload = {
             "source": "hybrid",
             "results": [],
             "total_count": 0,
             "page": page,
             "per_page": per_page
         }
+        logger.info("[Stage 10: API Response] (Empty Results) Leaving: total_count=0, results_count=0")
+        return res_payload
 
-    # 5. Duplicate Detection
+    # 5. Duplicate Detection (Stage 5)
+    logger.info("[Stage 5: Duplicate Removal] Entering: merged_results=%d", len(merged_results))
     dedup_start = time.perf_counter()
     deduplicated = []
     if facade:
@@ -378,9 +427,10 @@ def search(
             if url not in seen_urls:
                 seen_urls.add(url)
                 deduplicated.append(repo)
-    logger.info("Deduplication completed in %.2fms. Repositories before: %d, after: %d", (time.perf_counter() - dedup_start) * 1000, len(merged_results), len(deduplicated))
+    logger.info("[Stage 5: Duplicate Removal] Leaving: deduplicated=%d (removed %d duplicates in %.2fms)", len(deduplicated), len(merged_results) - len(deduplicated), (time.perf_counter() - dedup_start) * 1000)
 
-    # 6. AI Ranking
+    # 6. AI Ranking (Stage 7)
+    logger.info("[Stage 7: AI Ranking] Entering: candidates=%d", len(deduplicated))
     ranking_start = time.perf_counter()
     ranked_repos = []
     if facade:
@@ -388,12 +438,25 @@ def search(
             # Batch generate embeddings for candidates that don't have a semantic_score
             needing_embeddings = [r for r in deduplicated if r.get("semantic_score", 0.0) == 0.0]
             if needing_embeddings and query_vector is not None:
+                # Heuristically rank candidates to select the top 100 for deep embedding computation
+                def get_heuristic_score(r):
+                    lex = compute_lexical_score(r, expanded_queries)
+                    stars = int(r.get("stars") or 0)
+                    star_score = min(1.0, stars / 1000.0)
+                    return 0.7 * lex + 0.3 * star_score
+                
+                needing_embeddings.sort(key=get_heuristic_score, reverse=True)
+                
+                MAX_EMBED = 100
+                to_embed = needing_embeddings[:MAX_EMBED]
+                remaining = needing_embeddings[MAX_EMBED:]
+                
                 try:
                     embed_start = time.perf_counter()
-                    repo_embeddings = facade.generate_repository_embeddings(needing_embeddings)
+                    repo_embeddings = facade.generate_repository_embeddings(to_embed)
                     
                     q_norm = np.linalg.norm(query_vector)
-                    for idx, r in enumerate(needing_embeddings):
+                    for idx, r in enumerate(to_embed):
                         repo_vector = repo_embeddings[idx]
                         r_norm = np.linalg.norm(repo_vector)
                         if q_norm > 0 and r_norm > 0:
@@ -401,9 +464,13 @@ def search(
                             r["semantic_score"] = max(0.0, min(1.0, sim))
                         else:
                             r["semantic_score"] = 0.5
-                    logger.info("Batch computed embeddings for %d repositories in %.2fms", len(needing_embeddings), (time.perf_counter() - embed_start) * 1000)
+                    logger.info("Batch computed embeddings for %d repositories in %.2fms", len(to_embed), (time.perf_counter() - embed_start) * 1000)
                 except Exception as batch_exc:
                     logger.warning("Batch embedding generation failed: %s", str(batch_exc))
+                
+                # Assign default semantic score to the remaining candidates to prevent slow on-the-fly sequential generation
+                for r in remaining:
+                    r["semantic_score"] = 0.1
 
             candidates = [
                 _build_candidate_from_repo(repo, query_vector, facade, expanded_queries)
@@ -456,7 +523,15 @@ def search(
                     bullets.append("Relevant project match")
 
                 # Store rounded score representation (float rounded to 1 decimal place, e.g. 96.3)
-                ai_score_val = round(float(item.final_score * 100), 1)
+                lexical_score = compute_lexical_score(orig_repo, expanded_queries)
+                semantic_similarity = orig_repo.get("semantic_score", 0.0)
+                ai_ranking_score = item.final_score
+                
+                # Hybrid Search: Final Score = Lexical Score + Semantic Similarity + AI Ranking Score (scaled to 100)
+                combined_score = (lexical_score + semantic_similarity + ai_ranking_score) / 3.0
+                ai_score_val = round(float(combined_score * 100), 1)
+                
+                logger.info("[Stage 7: AI Ranking] Score Blending for %s: Lexical=%.2f, Semantic=%.2f, AI Ranking=%.2f -> Blended=%.2f", item.repo_id, lexical_score, semantic_similarity, ai_ranking_score, combined_score)
 
                 ranked_repos.append({
                     **orig_repo,
@@ -493,7 +568,7 @@ def search(
     for rank_idx, repo in enumerate(ranked_repos):
         repo["rank"] = rank_idx + 1
 
-    logger.info("AI ranking completed in %.2fms. Top repository: %s with score %s", (time.perf_counter() - ranking_start) * 1000, ranked_repos[0].get("full_name") if ranked_repos else "None", str(ranked_repos[0].get("matchScore", 0)) if ranked_repos else "0")
+    logger.info("[Stage 7: AI Ranking] Leaving: ranked_repos=%d (completed in %.2fms)", len(ranked_repos), (time.perf_counter() - ranking_start) * 1000)
 
     # 7. Index Learning (Add new discoveries to local index for persistent search improvement)
     if facade:
@@ -524,7 +599,7 @@ def search(
         db.rollback()
         logger.warning("Failed to cache search response or duplicate query committed concurrently: %s", str(cache_exc))
 
-    # Apply filters on ranked results before paginating
+    # Apply filters on ranked results before paginating (Stage 8)
     filtered_repos = apply_backend_filters(
         ranked_repos,
         language=language,
@@ -535,18 +610,22 @@ def search(
         sortBy=sortBy
     )
 
-    # Pagination slice
+    # Pagination slice (Stage 9)
+    logger.info("[Stage 9: Pagination] Entering: filtered_repos=%d, page=%d, per_page=%d", len(filtered_repos), page, per_page)
     start_idx = (page - 1) * per_page
     end_idx = start_idx + per_page
     paginated_results = filtered_repos[start_idx:end_idx]
+    logger.info("[Stage 9: Pagination] Leaving: paginated_results=%d", len(paginated_results))
 
     total_time = (time.perf_counter() - start_time) * 1000
     logger.info("Search pipeline completed in %.2fms. Returning %d results (page %d).", total_time, len(paginated_results), page)
 
-    return {
+    res_payload = {
         "source": "hybrid",
         "results": paginated_results,
         "total_count": len(filtered_repos),
         "page": page,
         "per_page": per_page
     }
+    logger.info("[Stage 10: API Response] Leaving: total_count=%d, results_count=%d", res_payload["total_count"], len(res_payload["results"]))
+    return res_payload

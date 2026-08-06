@@ -34,6 +34,17 @@ class DuplicateDetector:
         s2_clean = s2.strip().lower()
         if s1_clean == s2_clean:
             return 1.0
+            
+        # Use fast Jaccard similarity for longer strings to avoid O(N*M) Levenshtein bottleneck
+        if len(s1_clean) > 50 or len(s2_clean) > 50:
+            words1 = set(s1_clean.split())
+            words2 = set(s2_clean.split())
+            if not words1 or not words2:
+                return 0.0
+            intersection = len(words1.intersection(words2))
+            union = len(words1.union(words2))
+            return intersection / union
+
         dist = self._levenshtein(s1_clean, s2_clean)
         max_len = max(len(s1_clean), len(s2_clean))
         return 1.0 - (dist / max_len)

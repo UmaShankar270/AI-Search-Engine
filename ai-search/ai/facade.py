@@ -51,6 +51,16 @@ class AIFacade:
         self._summarizer = SummaryGenerator()
         self._duplicate_detector = DuplicateDetector()
 
+        if search_index_path:
+            import os
+            if os.path.exists(search_index_path):
+                try:
+                    self.load_index(search_index_path)
+                except Exception as e:
+                    logger.warning("Failed to automatically load search index from %s: %s", search_index_path, str(e))
+            else:
+                logger.info("Search index path %s does not exist; index will be empty or built dynamically", search_index_path)
+
     # --- Query Understanding ---
 
     def understand_query(self, query: str) -> QueryUnderstandingResult:
@@ -82,6 +92,20 @@ class AIFacade:
             language=language,
             readme_text=readme_text,
         )
+
+    def generate_repository_embeddings(self, repositories: list[dict[str, Any]]) -> np.ndarray:
+        composed_texts = []
+        from ai.embeddings.strategies import CompositionStrategy
+        for repo in repositories:
+            composed = CompositionStrategy.for_repository(
+                name=repo.get("name"),
+                description=repo.get("description"),
+                topics=repo.get("topics"),
+                language=repo.get("language"),
+                readme_text=repo.get("readme_text"),
+            )
+            composed_texts.append(composed)
+        return self.generate_embeddings(composed_texts)
 
     def warmup_embeddings(self) -> None:
         self._embedding_generator.warmup()
@@ -168,6 +192,30 @@ class AIFacade:
         self._search_engine.add_repositories(
             repositories=[{"repo_id": repo_id, "text": text, "metadata": metadata or {}}],
         )
+
+    def add_repositories(self, repositories: list[dict[str, Any]]) -> None:
+        formatted = []
+        for repo in repositories:
+            repo_id = repo.get("repo_id") or repo.get("full_name") or repo.get("id")
+            if not repo_id:
+                continue
+            text = repo.get("text")
+            if not text:
+                from ai.embeddings.strategies import CompositionStrategy
+                text = CompositionStrategy.for_repository(
+                    name=repo.get("name"),
+                    description=repo.get("description"),
+                    topics=repo.get("topics"),
+                    language=repo.get("language"),
+                    readme_text=repo.get("readme_text"),
+                )
+            metadata = repo.get("metadata") or repo
+            formatted.append({
+                "repo_id": repo_id,
+                "text": text,
+                "metadata": metadata
+            })
+        self._search_engine.add_repositories(formatted)
 
     def add_embeddings(
         self,

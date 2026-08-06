@@ -88,6 +88,7 @@ class GitHubProvider(RepositoryProvider):
             raise HTTPException(status_code=502, detail=f"GitHub API Connection Error: {str(e)}")
 
     def search(self, query: str, language: Optional[str] = None, page: int = 1, per_page: int = 10, sort: Optional[str] = None) -> list[dict[str, Any]]:
+        logger.info("[Stage 1: GitHub Provider] Entering with query='%s', language='%s', sort='%s'", query, language, sort)
         # Optimize query: search across metadata
         if "in:" not in query.lower():
             query_optimized = f"{query} in:name,description,topics"
@@ -127,17 +128,24 @@ class GitHubProvider(RepositoryProvider):
 
         # Fetch up to 5 pages concurrently to get a comprehensive set of results (up to 500 repositories)
         max_pages = 5
+        raw_items_count = 0
+        duplicate_filtered_count = 0
         with ThreadPoolExecutor(max_workers=max_pages) as executor:
             futures = [executor.submit(fetch_page, p) for p in range(1, max_pages + 1)]
             for fut in as_completed(futures):
                 items = fut.result()
+                raw_items_count += len(items)
                 for item in items:
                     repo_id = str(item.get("id"))
                     if repo_id not in seen_ids:
                         seen_ids.add(repo_id)
                         repos.append(self._normalize(item))
+                    else:
+                        duplicate_filtered_count += 1
 
-        logger.info(f"GitHub Search retrieved and merged {len(repos)} repositories across {max_pages} pages.")
+        logger.info("[Stage 1: GitHub Provider] API retrieved %d raw items across %d pages", raw_items_count, max_pages)
+        logger.info("[Stage 3: Repository Normalization] Entering: %d raw repos, leaving: %d normalized repos (filtered %d duplicate IDs)", raw_items_count, len(repos), duplicate_filtered_count)
+        logger.info("[Stage 1: GitHub Provider] Leaving: returned %d repositories", len(repos))
         return repos
 
 

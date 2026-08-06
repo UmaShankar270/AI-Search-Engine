@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    model_config = {"env_file": ".env", "env_prefix": "AI_"}
+    model_config = {"env_file": ".env", "env_prefix": "AI_", "extra": "ignore"}
 
     model_name: str = "all-MiniLM-L6-v2"
     embedding_dim: int = 384

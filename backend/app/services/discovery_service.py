@@ -24,7 +24,9 @@ class DiscoveryService:
             "huggingface": HuggingFaceProvider(),
             "paperswithcode": PapersWithCodeProvider()
         }
-        self._executor = ThreadPoolExecutor(max_workers=len(self.providers))
+
+    # Persistent class-level ThreadPoolExecutor to prevent cross-request thread starvation and blocking on shutdown
+    _executor = ThreadPoolExecutor(max_workers=50)
 
     def search_all_platforms(
         self,
@@ -35,6 +37,7 @@ class DiscoveryService:
         sortBy: Optional[str] = None
     ) -> list[dict[str, Any]]:
         """Concurrently fetch repositories from all platforms."""
+        logger.info("[Stage 2: Discovery Service] Entering with query='%s', language='%s'", query, language)
         results = []
         
         def safe_search(provider, **kwargs):
@@ -46,7 +49,6 @@ class DiscoveryService:
                 kwargs.pop("sort", None)
                 return provider.search(**kwargs)
 
-        # Parallel execution using a shared ThreadPoolExecutor
         future_to_platform = {
             self._executor.submit(
                 safe_search,
@@ -67,17 +69,19 @@ class DiscoveryService:
             platform = future_to_platform[future]
             try:
                 platform_results = future.result()
-                logger.info("Retrieved %d projects from %s", len(platform_results), platform)
+                logger.info("[Stage 2: Discovery Service] Platform '%s' returned %d projects", platform, len(platform_results))
                 results.extend(platform_results)
             except Exception as exc:
-                logger.error("Platform search failed for %s: %s", platform, str(exc))
+                logger.error("[Stage 2: Discovery Service] Platform '%s' search failed: %s", platform, str(exc))
 
         if not_done:
-            logger.warning("Platform search timed out after 3.0 seconds for platforms: %s. Returning accumulated results.", [future_to_platform[f] for f in not_done])
+            timed_out_platforms = [future_to_platform[f] for f in not_done]
+            logger.warning("[Stage 2: Discovery Service] Platform search timed out after 3.0 seconds for: %s. Filtering them out (timed out).", timed_out_platforms)
             for fut in not_done:
                 if not fut.done():
                     fut.cancel()
-                    
+                        
+        logger.info("[Stage 2: Discovery Service] Leaving: total accumulated projects=%d", len(results))
         return results
 
     def get_repo_details(self, platform: str, owner: str, repo: str) -> Optional[dict[str, Any]]:
